@@ -230,15 +230,19 @@
 	<ThingDef ParentName="TableGatherSpotBase">
 		<defName>Table1x1c</defName>
 		<label>table (1x1)</label>
+		<replaceTags>
+			<li>Table</li>
+		</replaceTags>
 		<graphicData>
-			<texPath>Things/Building/Furniture/Table1x1</texPath>
-			<graphicClass>Graphic_Multi</graphicClass>
-			<drawSize>(1,1)</drawSize>
-			<damageData>
-				<rect>(0,0.2,1,1)</rect>
-			</damageData>
+			<graphicClass>Graphic_Appearances</graphicClass>
+			<linkType>CornerFiller</linkType>
+			<texPath>Things/Building/Linked/LinkedTable</texPath>
+			<linkFlags>
+				<li>Custom7</li>
+			</linkFlags>
 		</graphicData>
-		<uiIconScale>0.8</uiIconScale>
+		<castEdgeShadows>true</castEdgeShadows>
+		<uiIconPath>Things/Building/Linked/LinkedTable_MenuIcon</uiIconPath>
 		<statBases>
 			<MaxHitPoints>40</MaxHitPoints>
 			<WorkToBuild>400</WorkToBuild>
@@ -246,7 +250,12 @@
 			<Flammability>1.0</Flammability>
 			<Beauty>0.3</Beauty>
 		</statBases>
-		<size>(1,1)</size>
+		<building>
+			<blueprintGraphicData>
+				<texPath>Things/Building/Linked/LinkedTable_Blueprint_Atlas</texPath>
+			</blueprintGraphicData>
+		</building>
+		<drawStyleCategory>Walls</drawStyleCategory>
 		<costStuffCount>20</costStuffCount>
 	</ThingDef>
 
@@ -311,25 +320,34 @@
 		<passability>Standable</passability>
 		<rotatable>true</rotatable>
 		<pathCost>0</pathCost>
+		<uiIconScale>0.4</uiIconScale>
+		<uiIconOffset>(0, -0.2)</uiIconOffset>
 		<graphicData>
 			<shaderType>CutoutComplex</shaderType>
 		</graphicData>
 		<statBases>
-			<Mass>4</Mass>
+			<MaxHitPoints>10</MaxHitPoints>
+			<WorkToBuild>100</WorkToBuild>
+			<Mass>2</Mass>
+			<Flammability>0</Flammability>
+			<Beauty>0</Beauty>
 		</statBases>
+		<researchPrerequisites>
+			<li>Electricity</li>
+		</researchPrerequisites>
 		<stuffCategories>
 			<li>Metallic</li>
 			<li>Woody</li>
 			<li>Stony</li>
 		</stuffCategories>
 		<costList>
-			<Steel>5</Steel>
+			<Steel>3</Steel>
 		</costList>
 		<uiOrder>2990</uiOrder>
 		<comps>
 			<li Class="CompProperties_Power">
 				<compClass>CompPowerTrader</compClass>
-				<basePowerConsumption>20</basePowerConsumption>
+				<basePowerConsumption>4</basePowerConsumption>
 				<powerUpgrades>
 					<li>
 						<researchProject>ColoredLights</researchProject>
@@ -337,14 +355,26 @@
 					</li>
 				</powerUpgrades>
 			</li>
-			<li Class="CompProperties_Styleable" />
 			<li Class="CompProperties_Glower">
-				<glowRadius>5</glowRadius>
+				<glowRadius>4</glowRadius>
 				<glowColor>(214,148,94,0)</glowColor>
 				<colorPickerEnabled>true</colorPickerEnabled>
 				<darklightToggle>true</darklightToggle>
 			</li>
 		</comps>
+		<building>
+			<relatedBuildCommands>
+				<li>RecessedLightMiddle</li>
+				<li>RecessedLightMiddleEnd</li>
+				<li>RecessedLightSingleSideEnd</li>
+				<li>RecessedLightDoubleSideEnd</li>
+				<li>RecessedLightDoubleMiddleEnd</li>
+				<li>RecessedLightTrippleSideEnd</li>
+			</relatedBuildCommands>
+		</building>
+		<replaceTags>
+			<li>Lamp</li>
+		</replaceTags>
 	</ThingDef>
 
 	<ThingDef ParentName="RecessedLight" Name ="RecessedLightMiddle">
@@ -354,7 +384,7 @@
 		<graphicData>
 			<texPath>Things/Building/Furniture/RecessedLight_Middle</texPath>
 		</graphicData>
-		<costStuffCount>2</costStuffCount>
+		<costStuffCount>1</costStuffCount>
 	</ThingDef>
 
 	<ThingDef ParentName="RecessedLight" Name ="RecessedLightMiddleEnd">
@@ -364,7 +394,7 @@
 		<graphicData>
 			<texPath>Things/Building/Furniture/RecessedLight_MiddleEnd</texPath>
 		</graphicData>
-		<costStuffCount>2</costStuffCount>
+		<costStuffCount>1</costStuffCount>
 	</ThingDef>
 
 	<ThingDef ParentName="RecessedLight" Name ="RecessedLightSingleSideEnd">
@@ -374,7 +404,7 @@
 		<graphicData>
 			<texPath>Things/Building/Furniture/RecessedLight_SingleSideEnd</texPath>
 		</graphicData>
-		<costStuffCount>2</costStuffCount>
+		<costStuffCount>1</costStuffCount>
 	</ThingDef>
 	
 	<ThingDef ParentName="RecessedLight" Name ="RecessedLightDoubleSideEnd">
@@ -384,7 +414,17 @@
 		<graphicData>
 			<texPath>Things/Building/Furniture/RecessedLight_DoubleSideEnd</texPath>
 		</graphicData>
-		<costStuffCount>4</costStuffCount>
+		<costStuffCount>2</costStuffCount>
+	</ThingDef>
+
+	<ThingDef ParentName="RecessedLight" Name ="RecessedLightDoubleMiddleEnd">
+		<defName>RecessedLightDoubleMiddleEnd</defName>
+		<label>recessed light double middle end</label>
+		<description>An ground mounted electrical lamp that lights an area. People need light to move and work at full speed.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RecessedLight_DoubleMiddleEnd</texPath>
+		</graphicData>
+		<costStuffCount>2</costStuffCount>
 	</ThingDef>
 
 	<ThingDef ParentName="RecessedLight" Name ="RecessedLightTrippleSideEnd">
@@ -394,7 +434,7 @@
 		<graphicData>
 			<texPath>Things/Building/Furniture/RecessedLight_TrippleSideEnd</texPath>
 		</graphicData>
-		<costStuffCount>6</costStuffCount>
+		<costStuffCount>3</costStuffCount>
 	</ThingDef>
 
 	<ThingDef Abstract="True" Name="WindowBase" ParentName="NonBuildableLampBase">
