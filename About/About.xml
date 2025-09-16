@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>More Vanilla Structure</name>
+	<author>Bammalting</author>
+	<packageId>Bammalting.morevanillastructure</packageId>
+	
+	<supportedVersions>
+		<li>1.6</li>
+	</supportedVersions>
+	<modDependencies>
+	</modDependencies>
+	<loadAfter>
+	</loadAfter>	
+	<incompatibleWith>
+	</incompatibleWith>
+	<description>Add Some Varient Vanilla Structures</description>
+</ModMetaData>
