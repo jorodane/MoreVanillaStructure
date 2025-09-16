@@ -306,27 +306,30 @@
 		</comps>
 	</ThingDef>
 
-	<ThingDef ParentName="LampBase">
-		<defName>RecessedLight</defName>
-		<label>recessed light</label>
-		<description>An ground mounted electrical lamp that lights an area. People need light to move and work at full speed.</description>
+	<ThingDef Abstract ="true" ParentName="LampBase" Name ="RecessedLight">
 		<designationHotKey>Misc11</designationHotKey>
 		<passability>Standable</passability>
+		<rotatable>true</rotatable>
 		<pathCost>0</pathCost>
 		<graphicData>
-			<texPath>Things/Building/Furniture/RecessedLight</texPath>
+			<shaderType>CutoutComplex</shaderType>
 		</graphicData>
-		<costList>
-			<Steel>20</Steel>
-		</costList>
 		<statBases>
 			<Mass>4</Mass>
 		</statBases>
+		<stuffCategories>
+			<li>Metallic</li>
+			<li>Woody</li>
+			<li>Stony</li>
+		</stuffCategories>
+		<costList>
+			<Steel>5</Steel>
+		</costList>
 		<uiOrder>2990</uiOrder>
 		<comps>
 			<li Class="CompProperties_Power">
 				<compClass>CompPowerTrader</compClass>
-				<basePowerConsumption>30</basePowerConsumption>
+				<basePowerConsumption>20</basePowerConsumption>
 				<powerUpgrades>
 					<li>
 						<researchProject>ColoredLights</researchProject>
@@ -336,7 +339,7 @@
 			</li>
 			<li Class="CompProperties_Styleable" />
 			<li Class="CompProperties_Glower">
-				<glowRadius>12</glowRadius>
+				<glowRadius>5</glowRadius>
 				<glowColor>(214,148,94,0)</glowColor>
 				<colorPickerEnabled>true</colorPickerEnabled>
 				<darklightToggle>true</darklightToggle>
@@ -344,6 +347,55 @@
 		</comps>
 	</ThingDef>
 
+	<ThingDef ParentName="RecessedLight" Name ="RecessedLightMiddle">
+		<defName>RecessedLightMiddle</defName>
+		<label>recessed light middle</label>
+		<description>An ground mounted electrical lamp that lights an area. People need light to move and work at full speed.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RecessedLight_Middle</texPath>
+		</graphicData>
+		<costStuffCount>2</costStuffCount>
+	</ThingDef>
+
+	<ThingDef ParentName="RecessedLight" Name ="RecessedLightMiddleEnd">
+		<defName>RecessedLightMiddleEnd</defName>
+		<label>recessed light middle end</label>
+		<description>An ground mounted electrical lamp that lights an area. People need light to move and work at full speed.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RecessedLight_MiddleEnd</texPath>
+		</graphicData>
+		<costStuffCount>2</costStuffCount>
+	</ThingDef>
+
+	<ThingDef ParentName="RecessedLight" Name ="RecessedLightSingleSideEnd">
+		<defName>RecessedLightSingleSideEnd</defName>
+		<label>recessed light single side end</label>
+		<description>An ground mounted electrical lamp that lights an area. People need light to move and work at full speed.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RecessedLight_SingleSideEnd</texPath>
+		</graphicData>
+		<costStuffCount>2</costStuffCount>
+	</ThingDef>
+	
+	<ThingDef ParentName="RecessedLight" Name ="RecessedLightDoubleSideEnd">
+		<defName>RecessedLightDoubleSideEnd</defName>
+		<label>recessed light double side end</label>
+		<description>An ground mounted electrical lamp that lights an area. People need light to move and work at full speed.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RecessedLight_DoubleSideEnd</texPath>
+		</graphicData>
+		<costStuffCount>4</costStuffCount>
+	</ThingDef>
+
+	<ThingDef ParentName="RecessedLight" Name ="RecessedLightTrippleSideEnd">
+		<defName>RecessedLightTrippleSideEnd</defName>
+		<label>recessed light tripple side end</label>
+		<description>An ground mounted electrical lamp that lights an area. People need light to move and work at full speed.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RecessedLight_TrippleSideEnd</texPath>
+		</graphicData>
+		<costStuffCount>6</costStuffCount>
+	</ThingDef>
 
 	<ThingDef Abstract="True" Name="WindowBase" ParentName="NonBuildableLampBase">
 		<designationCategory>Furniture</designationCategory>
