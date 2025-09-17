@@ -90,90 +90,6 @@
 		<designationHotKey>Misc3</designationHotKey>
 	</ThingDef>
 
-
-	<!-->ThingDef ParentName="MVSWallBase" Name="HalfHeightWall">
-		<defName>HalfHeightWall</defName>
-		<label>half height wall</label>
-		<description>An impassable wall. Capable of holding up a roof. Only one floor settled. Can store item on it</description>
-    <graphicData>
-      <texPath>Things/Building/Linked/HalfHeightWall</texPath>
-      <graphicClass>Graphic_Appearances</graphicClass>
-      <linkType>CornerFiller</linkType>
-      <linkFlags>
-        <li>Sandbags</li>
-      </linkFlags>
-    </graphicData>
-		<uiIconPath>Things/Building/Linked/HalfHeightWall/WallSmooth_MenuIcon</uiIconPath>
-		<uiIconPathsStuff>
-			<li>
-				<appearance>Planks</appearance>
-				<iconPath>Things/Building/Linked/HalfHeightWall/WallPlanks_MenuIcon</iconPath>
-			</li>
-			<li>
-				<appearance>Bricks</appearance>
-				<iconPath>Things/Building/Linked/HalfHeightWall/WallBricks_MenuIcon</iconPath>
-			</li>
-		</uiIconPathsStuff>
-		<statBases>
-			<MaxHitPoints>150</MaxHitPoints>
-      <WorkToBuild>80</WorkToBuild>
-			<Flammability>1.0</Flammability>
-			<MeditationFocusStrength>0.20</MeditationFocusStrength>
-		</statBases>
-		<costStuffCount>3</costStuffCount>
-		<stuffCategories>
-			<li>Woody</li>
-			<li>Stony</li>
-			<li>Metallic</li>
-		</stuffCategories>
-		<terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
-		<holdsRoof>false</holdsRoof>
-		<designationCategory>Structure</designationCategory>
-		<staticSunShadowHeight>0.3</staticSunShadowHeight>
-    <neverMultiSelect>false</neverMultiSelect>
-    <blockLight>false</blockLight>
-    <thingClass>Building_Storage</thingClass>
-    <building>
-      <isInert>false</isInert>
-      <supportsWallAttachments>false</supportsWallAttachments>
-      <storageGroupTag>Shelf</storageGroupTag>
-			<preventDeteriorationOnTop>true</preventDeteriorationOnTop>
-			<ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
-			<maxItemsInCell>1</maxItemsInCell>
-			<fixedStorageSettings>
-				<filter>
-					<disallowNotEverStorable>true</disallowNotEverStorable>
-					<categories>
-						<li>Root</li>
-					</categories>
-					<disallowedCategories>
-						<li>Chunks</li>
-						<li>Plants</li>
-						<li>Buildings</li>
-					</disallowedCategories>
-				</filter>
-			</fixedStorageSettings>
-      <defaultStorageSettings>
-        <priority>Preferred</priority>
-        <filter>
-        </filter>
-      </defaultStorageSettings>
-			<isStuffableAirtight>false</isStuffableAirtight>
-      <relatedBuildCommands>
-        <li>Door</li>
-        <li>Autodoor</li>
-        <li>OrnateDoor</li>
-        <li MayRequire="Ludeon.RimWorld.Anomaly">SecurityDoor</li>
-        <li MayRequire="Ludeon.RimWorld.Odyssey">VacBarrier</li>
-        <li>Cooler</li>
-        <li>Vent</li>
-      </relatedBuildCommands>
-		</building>
-    <inspectorTabs>
-			<li>ITab_Storage</li>
-		</inspectorTabs>
-		<surfaceType>Item</surfaceType>
-	</ThingDef-->
 	<ThingDef Abstract ="true" ParentName="BuildingBase" Name ="LinkableStorageBase">
 		<graphicData>
 			<graphicClass>Graphic_Appearances</graphicClass>
@@ -297,7 +213,8 @@
 				<multiplier>2</multiplier>
 			</li>
 		</damageMultipliers>
-		<designationHotKey>Misc3</designationHotKey>
+    <designationHotKey>Misc3</designationHotKey>
+    <surfaceType>Eat</surfaceType>
 		<altitudeLayer>Building</altitudeLayer>
 		<passability>Impassable</passability>
 		<drawStyleCategory>Walls</drawStyleCategory>

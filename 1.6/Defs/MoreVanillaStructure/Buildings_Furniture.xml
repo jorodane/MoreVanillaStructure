@@ -228,8 +228,8 @@
 
 
 	<ThingDef ParentName="TableGatherSpotBase">
-		<defName>Table1x1c</defName>
-		<label>table (1x1)</label>
+		<defName>LinkedTable</defName>
+		<label>linked table</label>
 		<replaceTags>
 			<li>Table</li>
 		</replaceTags>
