@@ -226,39 +226,6 @@
 		</researchPrerequisites>
 	</ThingDef>
 
-
-	<ThingDef ParentName="TableGatherSpotBase">
-		<defName>LinkedTable</defName>
-		<label>linked table</label>
-		<replaceTags>
-			<li>Table</li>
-		</replaceTags>
-		<graphicData>
-			<graphicClass>Graphic_Appearances</graphicClass>
-			<linkType>CornerFiller</linkType>
-			<texPath>Things/Building/Linked/LinkedTable</texPath>
-			<linkFlags>
-				<li>Custom7</li>
-			</linkFlags>
-		</graphicData>
-		<castEdgeShadows>true</castEdgeShadows>
-		<uiIconPath>Things/Building/Linked/LinkedTable_MenuIcon</uiIconPath>
-		<statBases>
-			<MaxHitPoints>40</MaxHitPoints>
-			<WorkToBuild>400</WorkToBuild>
-			<Mass>2</Mass>
-			<Flammability>1.0</Flammability>
-			<Beauty>0.3</Beauty>
-		</statBases>
-		<building>
-			<blueprintGraphicData>
-				<texPath>Things/Building/Linked/LinkedTable_Blueprint_Atlas</texPath>
-			</blueprintGraphicData>
-		</building>
-		<drawStyleCategory>Walls</drawStyleCategory>
-		<costStuffCount>20</costStuffCount>
-	</ThingDef>
-
 	<ThingDef ParentName="FurnitureWithQualityBase">
 		<defName>RoundStool</defName>
 		<label>roundstool</label>
@@ -314,6 +281,100 @@
 			<li Class="CompProperties_Styleable" />
 		</comps>
 	</ThingDef>
+
+
+	<ThingDef ParentName="TableGatherSpotBase" Name ="LinkedTable">
+		<defName>LinkedTable</defName>
+		<label>linked table</label>
+		<replaceTags>
+			<li>Table</li>
+		</replaceTags>
+		<graphicData>
+			<graphicClass>Graphic_Appearances</graphicClass>
+			<linkType>CornerFiller</linkType>
+			<texPath>Things/Building/Linked/LinkedTable</texPath>
+			<linkFlags>
+				<li>Custom7</li>
+			</linkFlags>
+		</graphicData>
+		<castEdgeShadows>true</castEdgeShadows>
+		<uiIconPath>Things/Building/Linked/LinkedTable_MenuIcon</uiIconPath>
+		<statBases>
+			<MaxHitPoints>40</MaxHitPoints>
+			<WorkToBuild>400</WorkToBuild>
+			<Mass>2</Mass>
+			<Flammability>1.0</Flammability>
+			<Beauty>0.3</Beauty>
+		</statBases>
+		<building>
+			<blueprintGraphicData>
+				<texPath>Things/Building/Linked/LinkedTable_Blueprint_Atlas</texPath>
+			</blueprintGraphicData>
+		</building>
+		<drawStyleCategory>Floors</drawStyleCategory>
+		<costStuffCount>20</costStuffCount>
+	</ThingDef>
+
+
+	<ThingDef Abstract = "true" ParentName="FurnitureWithQualityBase" Name ="LinkedPlantPotBase">
+		<thingClass>Building_PlantGrower</thingClass>
+		<graphicData>
+			<graphicClass>Graphic_Appearances</graphicClass>
+			<linkType>CornerFiller</linkType>
+			<texPath>Things/Building/Linked/LinkedTable</texPath>
+			<linkFlags>
+				<li>Custom8</li>
+			</linkFlags>
+		</graphicData>
+		<drawStyleCategory>Floors</drawStyleCategory>
+		<altitudeLayer>Building</altitudeLayer>
+		<passability>PassThroughOnly</passability>
+		<fillPercent>0.20</fillPercent>
+		<pathCost>50</pathCost>
+		<statBases>
+			<MaxHitPoints>75</MaxHitPoints>
+			<WorkToBuild>250</WorkToBuild>
+			<Mass>2</Mass>
+			<Flammability>1.0</Flammability>
+		</statBases>
+		<stuffCategories>
+			<li>Metallic</li>
+			<li>Woody</li>
+			<li>Stony</li>
+		</stuffCategories>
+		<costStuffCount>20</costStuffCount>
+		<comps>
+			<li Class="CompProperties_Forbiddable"/>
+		</comps>
+		<fertility>1.0</fertility>
+		<designationHotKey>Misc9</designationHotKey>
+		<uiOrder>2600</uiOrder>
+		<leaveResourcesWhenKilled>false</leaveResourcesWhenKilled>
+		<building>
+			<defaultPlantToGrow>Plant_Daylily</defaultPlantToGrow>
+			<sowTag>Decorative</sowTag>
+			<paintable>true</paintable>
+		</building>
+		<rotatable>false</rotatable>
+	</ThingDef>
+
+	<ThingDef ParentName="LinkedPlantPotBase" Name ="LinkedPlantPotRound">
+		<defName>LinkedPlantPotRound</defName>
+		<label>linked plant pot round</label>
+		<description>Plant decorative flowers here to improve the mood of people nearby. Can link for every pots</description>
+		<uiIconPath>Things/Building/Linked/LinkedPlantPotRound_MenuIcon</uiIconPath>
+		<graphicData>
+			<texPath>Things/Building/Linked/LinkedPlantPotRound</texPath>
+		</graphicData>
+		<building>
+			<blueprintGraphicData>
+				<texPath>Things/Building/Linked/LinkedPlantPotRound_Blueprint_Atlas</texPath>
+			</blueprintGraphicData>
+		</building>
+	</ThingDef>
+
+
+
 
 	<ThingDef Abstract ="true" ParentName="LampBase" Name ="RecessedLight">
 		<designationHotKey>Misc11</designationHotKey>
