@@ -373,6 +373,20 @@
 		</building>
 	</ThingDef>
 
+	<ThingDef ParentName="LinkedPlantPotBase" Name ="LinkedPlantPotSquare">
+		<defName>LinkedPlantPotSquare</defName>
+		<label>linked plant pot square</label>
+		<description>Plant decorative flowers here to improve the mood of people nearby. Can link for every pots</description>
+		<uiIconPath>Things/Building/Linked/LinkedPlantPotSquare_MenuIcon</uiIconPath>
+		<graphicData>
+			<texPath>Things/Building/Linked/LinkedPlantPotSquare</texPath>
+		</graphicData>
+		<building>
+			<blueprintGraphicData>
+				<texPath>Things/Building/Linked/LinkedPlantPotSquare_Blueprint_Atlas</texPath>
+			</blueprintGraphicData>
+		</building>
+	</ThingDef>
 
 
 
