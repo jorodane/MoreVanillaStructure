@@ -456,4 +456,67 @@
 		</comps>
 	</ThingDef>
 
+  <ThingDef Name="GlassDoor" ParentName="DoorBase">
+    <defName>GlassDoor</defName>
+    <label>glass door</label>
+    <description>Divides rooms with glass. Simple doors must be manually opened, which slows people down. The amount of slowdown depends on what the door is made of.</description>
+    <statBases>
+      <WorkToBuild>850</WorkToBuild>
+    </statBases>
+    <graphicData>
+      <texPath>Things/Building/Door/GlassDoorSimple_Mover</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <damageData>
+        <enabled>false</enabled>
+      </damageData>
+    </graphicData>
+    <uiIconPath>Things/Building/Door/GlassDoorSimple_MenuIcon</uiIconPath>
+    <costList>
+      <Steel>10</Steel>
+    </costList>
+    <costStuffCount>15</costStuffCount>
+    <designationHotKey>Misc1</designationHotKey>
+    <building>
+      <isStuffableAirtight>true</isStuffableAirtight>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="DoorBase">
+    <defName>GlassAutodoor</defName>
+    <label>glass autodoor</label>
+    <description>Divides rooms with glass. Powered operation allows people to move through the door without slowing down.</description>
+    <statBases>
+      <WorkToBuild>1100</WorkToBuild>
+    </statBases>
+    <graphicData>
+      <texPath>Things/Building/Door/GlassAutodoor_Mover</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <damageData>
+        <enabled>false</enabled>
+      </damageData>
+    </graphicData>
+    <uiIconPath>Things/Building/Door/GlassAutodoor_MenuIcon</uiIconPath>
+    <costList>
+      <Steel>50</Steel>
+      <ComponentIndustrial>2</ComponentIndustrial>
+    </costList>
+    <costStuffCount>15</costStuffCount>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>50</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Breakdownable"/>
+      <li Class="CompProperties_Styleable" />
+    </comps>
+    <designationHotKey>Misc2</designationHotKey>
+    <researchPrerequisites>
+      <li>Autodoors</li>
+    </researchPrerequisites>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <building>
+      <isStuffableAirtight>true</isStuffableAirtight>
+    </building>
+  </ThingDef>
+
 </Defs>
