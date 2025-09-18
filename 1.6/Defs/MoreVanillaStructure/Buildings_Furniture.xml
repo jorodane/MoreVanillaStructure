@@ -326,6 +326,9 @@
 				<li>Custom8</li>
 			</linkFlags>
 		</graphicData>
+    <replaceTags>
+      <li>PlantPot</li>
+    </replaceTags>
 		<drawStyleCategory>Floors</drawStyleCategory>
 		<altitudeLayer>Building</altitudeLayer>
 		<passability>PassThroughOnly</passability>
@@ -392,7 +395,8 @@
 
 	<ThingDef Abstract ="true" ParentName="LampBase" Name ="RecessedLight">
 		<designationHotKey>Misc11</designationHotKey>
-		<passability>Standable</passability>
+    <drawStyleCategory>Walls</drawStyleCategory>
+    <passability>Standable</passability>
 		<rotatable>true</rotatable>
 		<pathCost>0</pathCost>
 		<uiIconScale>0.4</uiIconScale>

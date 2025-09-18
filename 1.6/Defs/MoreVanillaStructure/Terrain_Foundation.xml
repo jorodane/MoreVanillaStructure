@@ -81,7 +81,8 @@
 		<altitudeLayer>FloorEmplacement</altitudeLayer>
 		<category>Building</category>
 		<thingClass>Building</thingClass>
-		<replaceTags>
+    <drawStyleCategory>Walls</drawStyleCategory>
+    <replaceTags>
 			<li>Floor</li>
 		</replaceTags>
 		<coversFloor>false</coversFloor>
