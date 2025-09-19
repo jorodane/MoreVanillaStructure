@@ -3,14 +3,14 @@
 
   <JobDef>
     <defName>Play_Darts</defName>
-    <driverClass>JobDriver_PlayDarts</driverClass>
+    <driverClass>MoreVanillaStructure.JobDriver_PlayDarts</driverClass>
     <reportString>throwing darts.</reportString>
     <joyDuration>4000</joyDuration>
     <joyMaxParticipants>3</joyMaxParticipants>
     <joySkill>Shooting</joySkill>
     <joyXpPerTick>0.003</joyXpPerTick>
     <joyKind>Gaming_Dexterity</joyKind>
-    <taleOnCompletion>PlayedGame</taleOnCompletion>
+	  <!-->taleOnCompletion>PlayedGame</taleOnCompletion-->
     <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
   </JobDef>
 
