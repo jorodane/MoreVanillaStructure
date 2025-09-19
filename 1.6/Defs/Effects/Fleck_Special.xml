@@ -3,7 +3,7 @@
 
 	<FleckDef Abstract ="true" ParentName="FleckBase_Thrown" Name ="FleckDartBase">
 		<defName>FleckDartBase</defName>
-		<altitudeLayer>MoteLow</altitudeLayer>
+		<altitudeLayer>Projectile</altitudeLayer>
 		<solidTime>6</solidTime>
 		<fadeOutTime>2</fadeOutTime>
 		<landSound>HorseshoeImpact</landSound>

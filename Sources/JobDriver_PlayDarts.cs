@@ -54,7 +54,7 @@ namespace MoreVanillaStructure
             dir.Normalize();
             Vector3 left = new Vector3(-dir.z, 0, dir.x);
 
-            Vector3 offset = (Rand.Range(-0.1f,0f) * dir) + (Rand.Range(-0.2f, 0.2f) * left);
+            Vector3 offset = (Rand.Range(-0.05f,0f) * dir) + (Rand.Range(-0.2f, 0.2f) * left);
             to += offset;
             dir = to - from;
             float distance = dir.magnitude;
