@@ -15,6 +15,7 @@ namespace MoreVanillaStructure
         private const int ThrowSpeed = 24;
         private const int ThrowInterval = 180;
         TargetIndex BoardIndex => TargetIndex.A;
+        FleckDef dart;
 
         public override bool TryMakePreToilReservations(bool errorOnFailed) => pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed);
 
@@ -28,7 +29,7 @@ namespace MoreVanillaStructure
 
             TargetInfo pawnInfo = new TargetInfo(pawn.Position, pawn.Map);
             TargetInfo boardInfo = new TargetInfo(board.Position, board.Map);
-
+            dart = GetDartFromIndex(Rand.Range(0,4)); //DefDatabase<FleckDef>.GetNamed("Fleck_Dart");
             Toil play = new Toil();
             play.tickAction = () =>
             {
@@ -53,18 +54,29 @@ namespace MoreVanillaStructure
             dir.Normalize();
             Vector3 left = new Vector3(-dir.z, 0, dir.x);
 
-            var offset = (Rand.Range(-0.2f,0f) * dir) + (Rand.Range(-0.2f, 0.2f) * left);
+            Vector3 offset = (Rand.Range(-0.1f,0f) * dir) + (Rand.Range(-0.2f, 0.2f) * left);
             to += offset;
             dir = to - from;
             float distance = dir.magnitude;
             dir.Normalize();
 
-            var data = FleckMaker.GetDataStatic(from, thrower.Map, DefDatabase<FleckDef>.GetNamed("Fleck_Dart"));
+            FleckCreationData data = FleckMaker.GetDataStatic(from, thrower.Map, dart);
 
             data.velocity = dir * ThrowSpeed;
             data.rotation = (-Mathf.Rad2Deg * Mathf.Atan2(dir.z, dir.x)) + Rand.Range(-2f, 2f);
             data.airTimeLeft = distance / ThrowSpeed;
             thrower.Map.flecks.CreateFleck(data);
+        }
+
+        public static FleckDef GetDartFromIndex(int index)
+        {
+            switch(index) 
+            {
+                case 0: return MoreVanillaStructureDefs.Fleck_Dart_Red;
+                case 1: return MoreVanillaStructureDefs.Fleck_Dart_Yellow;
+                case 2: return MoreVanillaStructureDefs.Fleck_Dart_Blue;
+                default: return MoreVanillaStructureDefs.Fleck_Dart_Green;
+            }
         }
     }
 }

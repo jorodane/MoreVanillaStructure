@@ -8,6 +8,9 @@ namespace MoreVanillaStructure
     public static class MoreVanillaStructureDefs
     {
         public static JobDef Play_Darts;
-        public static FleckDef Fleck_Dart;
+        public static FleckDef Fleck_Dart_Red;
+        public static FleckDef Fleck_Dart_Yellow;
+        public static FleckDef Fleck_Dart_Blue;
+        public static FleckDef Fleck_Dart_Green;
     }
 }
