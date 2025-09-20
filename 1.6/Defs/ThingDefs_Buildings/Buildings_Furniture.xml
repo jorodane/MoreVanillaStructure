@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Defs>
+	
+	
+	<!-- Town Bells -->
+	
+	
 	<ThingDef Abstract ="true" ParentName ="BuildingBase" Name="TownBellBase">
 		<surfaceType>Item</surfaceType>
 		<noRightClickDraftAttack>true</noRightClickDraftAttack>
@@ -30,6 +35,10 @@
 			<paintable>true</paintable>
 		</building>
 		<designationCategory>Misc</designationCategory>
+		<tradeTags>
+			<li>Furniture</li>
+		</tradeTags>
+		<tradeability>Sellable</tradeability>
 	</ThingDef>
 
 	<ThingDef ParentName="TownBellBase" Name="MiniTownBell">
@@ -85,10 +94,6 @@
 			<shaderType>CutoutComplex</shaderType>
 			<drawSize>(2,2)</drawSize>
 			<drawOffset>(0,0.5,0.5)</drawOffset>
-			<!--drawOffsetNorth>(0,0,0.9)</drawOffsetNorth>
-			<drawOffsetSouth>(0,0,-0.9)</drawOffsetSouth>
-			<drawOffsetWest>(-0.9,0,0)</drawOffsetWest>
-			<drawOffsetEast>(0.9,0,0)</drawOffsetEast-->
 			<damageData>
 				<rect>(0.25,0.25,0.75,0.75)</rect>
 			</damageData>
@@ -98,6 +103,22 @@
 			<paintable>true</paintable>
 		</building>
 	</ThingDef>
+
+
+
+
+
+
+	
+	
+	
+	<!-- Beds -->
+	
+	
+	
+	
+	
+	
 	
 	
 	<ThingDef ParentName="Bed" Name="WoodBed">
@@ -174,6 +195,22 @@
 		</building>
 	</ThingDef>
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- Chairs -->
+	
+	
+	
+	
+	
 
 	<ThingDef ParentName="ArtableFurnitureBase">
 		<defName>SchoolChair</defName>
@@ -282,6 +319,115 @@
 		</comps>
 	</ThingDef>
 
+	
+	
+	<!-- Mirrors -->
+
+	<ThingDef Abstract ="true" ParentName="BuildingBase" Name ="MirrorBase">
+		<graphicData>
+			<graphicClass>Graphic_Multi</graphicClass>
+			<shaderType>CutoutComplex</shaderType>
+			<drawOffsetNorth>(0,0,0.43)</drawOffsetNorth>
+			<drawOffsetSouth>(0,0,-0.2)</drawOffsetSouth>
+			<drawOffsetWest>(-0.3,0,0)</drawOffsetWest>
+			<drawOffsetEast>(0.3,0,0)</drawOffsetEast>
+			<damageData>
+				<enabled>false</enabled>
+			</damageData>
+		</graphicData>
+		<altitudeLayer>BuildingOnTop</altitudeLayer>
+		<drawPlaceWorkersWhileSelected>true</drawPlaceWorkersWhileSelected>
+		<rotatable>true</rotatable>
+		<minifiedDef>MinifiedThing</minifiedDef>
+		<socialPropernessMatters>true</socialPropernessMatters>
+		<thingCategories>
+			<li>BuildingsJoy</li>
+		</thingCategories>
+		<statBases>
+			<WorkToBuild>100</WorkToBuild>
+			<MaxHitPoints>300</MaxHitPoints>
+			<Mass>3</Mass>
+			<Flammability>1.0</Flammability>
+			<JoyGainFactor>0.5</JoyGainFactor>
+			<Beauty>3</Beauty>
+		</statBases>
+		<costList>
+			<Steel>20</Steel>
+		</costList>
+		<stuffCategories>
+			<li>Metallic</li>
+			<li>Woody</li>
+			<li>Stony</li>
+		</stuffCategories>
+		<costStuffCount>20</costStuffCount>
+		<pathCost>0</pathCost>
+		<passability>Standable</passability>
+		<defaultPlacingRot>South</defaultPlacingRot>
+		<building>
+			<joyKind>Television</joyKind>
+			<watchBuildingStandDistanceRange>-1~-1</watchBuildingStandDistanceRange>
+			<watchBuildingStandRectWidth>1</watchBuildingStandRectWidth>
+			<watchBuildingInSameRoom>true</watchBuildingInSameRoom>
+			<effectWatching>WatchingTelevision</effectWatching>
+			<paintable>true</paintable>
+			<isEdifice>false</isEdifice>
+			<isAttachment>true</isAttachment>
+			<relatedBuildCommands>
+				<li>RoundMirror</li>
+				<li>SquareMirror</li>
+			</relatedBuildCommands>
+		</building>
+		<terrainAffordanceNeeded IsNull="True" />
+		<placeWorkers>
+			<li>Placeworker_AttachedToWall</li>
+			<li>PlaceWorker_WatchArea</li>
+		</placeWorkers>
+		<tradeTags>
+			<li>Furniture</li>
+		</tradeTags>
+		<designationCategory>Furniture</designationCategory>
+		<designationHotKey>Misc4</designationHotKey>
+		<constructionSkillPrerequisite>2</constructionSkillPrerequisite>
+	</ThingDef>
+
+	<ThingDef ParentName="MirrorBase" Name ="RoundMirror">
+		<defName>RoundMirror</defName>
+		<label>round mirror</label>
+		<description>A round mirror. It reflects the other side. Those with beauty sometimes find joy in tending to themselves.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RoundMirror</texPath>
+		</graphicData>
+		<uiIconPath>Things/Building/Furniture/RoundMirror_MenuIcon</uiIconPath>
+	</ThingDef>
+
+	<ThingDef ParentName="MirrorBase" Name ="SquareMirror">
+		<defName>SquareMirror</defName>
+		<label>square mirror</label>
+		<description>A square mirror. It reflects the other side. Those with beauty sometimes find joy in tending to themselves.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/RoundMirror</texPath>
+		</graphicData>
+		<uiIconPath>Things/Building/Furniture/RoundMirror_MenuIcon</uiIconPath>
+	</ThingDef>
+
+
+
+
+
+
+
+	<!-- Linked   -->
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	<ThingDef ParentName="TableGatherSpotBase" Name ="LinkedTable">
 		<defName>LinkedTable</defName>
@@ -357,6 +503,10 @@
 			<defaultPlantToGrow>Plant_Daylily</defaultPlantToGrow>
 			<sowTag>Decorative</sowTag>
 			<paintable>true</paintable>
+			<relatedBuildCommands>
+				<li>LinkedPlantPotRound</li>
+				<li>LinkedPlantPotSquare</li>
+			</relatedBuildCommands>
 		</building>
 		<rotatable>false</rotatable>
 	</ThingDef>
@@ -391,6 +541,83 @@
 		</building>
 	</ThingDef>
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- Lights -->
+
+	
+	
+
+	<ThingDef ParentName="LampBase">
+		<defName>StraightFloodLight</defName>
+		<label>straight flood light</label>
+		<description>A low-intensity light but good for outdoor spaces.</description>
+		<graphicData>
+			<texPath>Things/Building/Furniture/StraightFloodLight_Long</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<shaderType>CutoutComplex</shaderType>
+			<drawSize>3.5</drawSize>
+			<addTopAltitudeBias>true</addTopAltitudeBias>
+			<drawOffset>(0,0.6,0.6)</drawOffset>
+			<shadowData>
+				<volume>(0.3, 0.7, 0.3)</volume>
+				<offset>(0, 0, -0.2)</offset>
+			</shadowData>
+		</graphicData>
+		<uiIconScale>0.3</uiIconScale>
+		<costList>
+			<Steel>10</Steel>
+		</costList>
+		<stuffCategories>
+			<li>Metallic</li>
+			<li>Woody</li>
+			<li>Stony</li>
+		</stuffCategories>
+		<costStuffCount>40</costStuffCount>
+		<statBases>
+			<MaxHitPoints>120</MaxHitPoints>
+			<WorkToBuild>600</WorkToBuild>
+			<Flammability>0</Flammability>
+			<Mass>10</Mass>
+			<Beauty>-5</Beauty>
+		</statBases>
+		<uiOrder>2992</uiOrder>
+		<researchPrerequisites>
+			<li>ColoredLights</li>
+		</researchPrerequisites>
+		<comps>
+			<li Class="CompProperties_Power">
+				<compClass>CompPowerTrader</compClass>
+				<basePowerConsumption>50</basePowerConsumption>
+				<powerUpgrades>
+					<li>
+						<researchProject>ColoredLights</researchProject>
+						<factor>0.5</factor>
+					</li>
+				</powerUpgrades>
+			</li>
+			<li Class="CompProperties_Glower">
+				<glowRadius>12</glowRadius>
+				<glowColor>(214,148,94,0)</glowColor>
+				<colorPickerEnabled>true</colorPickerEnabled>
+				<darklightToggle>true</darklightToggle>
+			</li>
+		</comps>
+		<tradeability>None</tradeability>
+	</ThingDef>
 
 
 	<ThingDef Abstract ="true" ParentName="LampBase" Name ="RecessedLight">
@@ -454,6 +681,7 @@
 		<replaceTags>
 			<li>Lamp</li>
 		</replaceTags>
+		<tradeability>None</tradeability>
 	</ThingDef>
 
 	<ThingDef ParentName="RecessedLight" Name ="RecessedLightMiddle">
@@ -546,7 +774,6 @@
 				<enabled>false</enabled>
 			</damageData>
 		</graphicData>
-		<!--uiIconPath>Things/Building/Furniture/Window/Window_MenuIcon</uiIconPath-->
 		<altitudeLayer>BuildingOnTop</altitudeLayer>
 		<costList>
 			<Steel>10</Steel>

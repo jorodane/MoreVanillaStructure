@@ -1,12 +1,8 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.AI;
-using Verse.AI.Group;
 
 namespace MoreVanillaStructure
 {
@@ -23,24 +19,25 @@ namespace MoreVanillaStructure
         {
             this.FailOnDespawnedOrNull(BoardIndex);
             Building board = job.GetTarget(BoardIndex).Thing as Building;
-            if (board == null) { ReadyForNextToil(); }
 
             yield return Toils_Goto.GotoCell(TargetIndex.B, PathEndMode.OnCell);
 
             TargetInfo pawnInfo = new TargetInfo(pawn.Position, pawn.Map);
             TargetInfo boardInfo = new TargetInfo(board.Position, board.Map);
             dart = GetDartFromIndex(Rand.Range(0,4)); //DefDatabase<FleckDef>.GetNamed("Fleck_Dart");
-            Toil play = new Toil();
+            Toil play = new Toil()
+            {
+                socialMode = RandomSocialMode.SuperActive,
+                handlingFacing = true,
+                defaultCompleteMode = ToilCompleteMode.Never
+            };
             play.tickAction = () =>
             {
-                if (board == null) { ReadyForNextToil(); return; }
+                this.FailOnDespawnedOrNull(BoardIndex);
                 pawn.rotationTracker.FaceTarget(board);
                 if (pawn.IsHashIntervalTick(ThrowInterval)) ThrowDartFleck(pawn, board);
-                if (JoyUtility.JoyTickCheckEnd(pawn, 1, JoyTickFullJoyAction.EndJob, 1f)) { ReadyForNextToil(); return; }
+                if (JoyUtility.JoyTickCheckEnd(pawn, 1, JoyTickFullJoyAction.EndJob, 1f, board)) { return; }
             };
-            play.defaultCompleteMode = ToilCompleteMode.Never;
-            play.handlingFacing = true;
-            play.socialMode = RandomSocialMode.SuperActive;
             yield return play;
         }
 
@@ -54,23 +51,27 @@ namespace MoreVanillaStructure
             dir.Normalize();
             Vector3 left = new Vector3(-dir.z, 0, dir.x);
 
-            Vector3 offset = (Rand.Range(-0.05f,0f) * dir) + (Rand.Range(-0.2f, 0.2f) * left);
+            Vector2 miss = new Vector2(Rand.Range(-0.1f, 0.1f), Rand.Range(-0.025f, 0f)) * thrower.GetStatValue(StatDefOf.MortarMissRadiusFactor);
+            //bool centerHit = miss.sqrMagnitude <= 0.00001f;
+            //if (centerHit) thrower.needs?.mood?.thoughts?.memories?.TryGainMemory(MoreVanillaStructureDefs.HitBetweenTheEyes);
+
+            Vector3 offset = (miss.y * dir) + (miss.x * left);
             to += offset;
             dir = to - from;
             float distance = dir.magnitude;
             dir.Normalize();
-
             FleckCreationData data = FleckMaker.GetDataStatic(from, thrower.Map, dart);
 
             data.velocity = dir * ThrowSpeed;
-            data.rotation = (-Mathf.Rad2Deg * Mathf.Atan2(dir.z, dir.x)) + Rand.Range(-2f, 2f);
+            data.rotation = (-Mathf.Rad2Deg * Mathf.Atan2(dir.z, dir.x));
             data.airTimeLeft = distance / ThrowSpeed;
             thrower.Map.flecks.CreateFleck(data);
+
         }
 
         public static FleckDef GetDartFromIndex(int index)
         {
-            switch(index) 
+            switch (index)
             {
                 case 0: return MoreVanillaStructureDefs.Fleck_Dart_Red;
                 case 1: return MoreVanillaStructureDefs.Fleck_Dart_Yellow;

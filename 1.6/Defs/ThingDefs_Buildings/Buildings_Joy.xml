@@ -47,7 +47,7 @@
 		<building>
 			<joyKind>Gaming_Dexterity</joyKind>
 			<watchBuildingStandDistanceRange>-3~-3</watchBuildingStandDistanceRange>
-			<watchBuildingStandRectWidth>3</watchBuildingStandRectWidth>
+			<watchBuildingStandRectWidth>1</watchBuildingStandRectWidth>
 			<watchBuildingInSameRoom>true</watchBuildingInSameRoom>
 			<artificialForMeditationPurposes>false</artificialForMeditationPurposes>
 			<paintable>true</paintable>

@@ -454,6 +454,7 @@
 				<darklightToggle>true</darklightToggle>
 			</li>
 		</comps>
+		<tradeability>None</tradeability>
 	</ThingDef>
 
   <ThingDef Name="GlassDoor" ParentName="DoorBase">

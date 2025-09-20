@@ -49,6 +49,8 @@
   <ItemGroup>
     <Compile Include="Initiator.cs" />
     <Compile Include="JobDriver_PlayDarts.cs" />
+    <Compile Include="JobDriver_WatchFace.cs" />
+    <Compile Include="JoyGiver_WatchFace.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
