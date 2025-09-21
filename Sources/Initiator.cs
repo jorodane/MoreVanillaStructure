@@ -11,6 +11,8 @@ namespace MoreVanillaStructure
 
         public static ThoughtDef HitBetweenTheEyes;
 
+        public static HediffDef FanBreeze;
+
         public static FleckDef Fleck_Dart_Red;
         public static FleckDef Fleck_Dart_Yellow;
         public static FleckDef Fleck_Dart_Blue;
