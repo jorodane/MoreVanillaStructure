@@ -566,7 +566,7 @@
       <allowFlip>true</allowFlip>
     </graphicData>
     <building>
-      <watchBuildingStandDistanceRange>0~2</watchBuildingStandDistanceRange>
+      <watchBuildingStandDistanceRange>1~2</watchBuildingStandDistanceRange>
       <watchBuildingStandRectWidth>3</watchBuildingStandRectWidth>
       <watchBuildingInSameRoom>true</watchBuildingInSameRoom>
     </building>
