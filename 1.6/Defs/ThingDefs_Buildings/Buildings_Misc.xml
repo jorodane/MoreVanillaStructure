@@ -227,7 +227,131 @@
       <li>PlaceWorker_AnimalPenMarker</li>
     </placeWorkers>
   </ThingDef>
-  
-  
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	<!-- Town Bells -->
+	
+
+
+
+	<ThingDef Abstract ="true" ParentName ="BuildingBase" Name="TownBellBase">
+		<surfaceType>Item</surfaceType>
+		<noRightClickDraftAttack>true</noRightClickDraftAttack>
+		<hasInteractionCell>true</hasInteractionCell>
+		<interactionCellOffset>(0,0,1)</interactionCellOffset>
+		<graphicData>
+			<graphicClass>Graphic_Multi</graphicClass>
+			<shaderType>CutoutComplex</shaderType>
+			<damageData>
+				<rect>(0.25,0.25,0.75,0.75)</rect>
+			</damageData>
+		</graphicData>
+		<size>(1,1)</size>
+		<stuffCategories>
+			<li>Metallic</li>
+			<li>Woody</li>
+			<li>Stony</li>
+		</stuffCategories>
+		<costList>
+			<Steel>40</Steel>
+		</costList>
+		<designationHotKey>Misc2</designationHotKey>
+		<passability>PassThroughOnly</passability>
+		<defaultPlacingRot>South</defaultPlacingRot>
+		<uiOrder>2050</uiOrder>
+		<designationCategory>Misc</designationCategory>
+		<comps>
+			<li Class="MoreVanillaStructure.CompProperties_EmergencyDrafter">
+				<assignableClass>MoreVanillaStructure.CompEmergencyDrafter</assignableClass>
+			</li>
+		</comps>
+		<inspectorTabs>
+			<li>MoreVanillaStructure.ITab_DraftSetting</li>
+		</inspectorTabs>
+	</ThingDef>
+
+	<ThingDef ParentName="TownBellBase" Name="MiniTownBell">
+		<defName>Mini_Town_Bell</defName>
+		<label>MiniBell</label>
+		<description>Mini Size Town Bell. Can Draft Colonists</description>
+		<rotatable>true</rotatable>
+		<fillPercent>0.4</fillPercent>
+		<thingCategories>
+			<li>BuildingsFurniture</li>
+		</thingCategories>
+		<minifiedDef>MinifiedThing</minifiedDef>
+		<size>(1,1)</size>
+		<graphicData>
+			<texPath>Things/Building/Furniture/MiniTownBell</texPath>
+			<drawSize>(1,1)</drawSize>
+			<damageData>
+				<rect>(0.25,0.25,0.75,0.75)</rect>
+			</damageData>
+		</graphicData>
+		<statBases>
+			<MaxHitPoints>150</MaxHitPoints>
+			<Beauty>-2</Beauty>
+			<WorkToBuild>300</WorkToBuild>
+			<Mass>30</Mass>
+		</statBases>
+		<costStuffCount>20</costStuffCount>
+		<passability>PassThroughOnly</passability>
+		<building>
+			<buildingSizeCategory>Small</buildingSizeCategory>
+			<paintable>true</paintable>
+		</building>
+	</ThingDef>
+
+	<ThingDef ParentName="TownBellBase" Name="MediumTownBell">
+		<defName>Medium_Town_Bell</defName>
+		<label>MediumBell</label>
+		<rotatable>false</rotatable>
+		<fillPercent>0.7</fillPercent>
+		<description>Medium Size Town Bell. Can Draft Colonists</description>
+		<costStuffCount>50</costStuffCount>
+		<passability>Standable</passability>
+		<size>(2,1)</size>
+		<statBases>
+			<MaxHitPoints>500</MaxHitPoints>
+			<Beauty>0</Beauty>
+			<WorkToBuild>1000</WorkToBuild>
+			<Mass>100</Mass>
+		</statBases>
+		<graphicData>
+			<texPath>Things/Building/Furniture/MediumTownBell</texPath>
+			<graphicClass>Graphic_Multi</graphicClass>
+			<shaderType>CutoutComplex</shaderType>
+			<drawSize>(2,2)</drawSize>
+			<drawOffset>(0,0.5,0.5)</drawOffset>
+			<damageData>
+				<rect>(0.25,0.25,0.75,0.75)</rect>
+			</damageData>
+		</graphicData>
+		<building>
+			<buildingSizeCategory>Medium</buildingSizeCategory>
+			<paintable>true</paintable>
+		</building>
+	</ThingDef>
+
+
+
+
+
+
+
+
 
 </Defs>

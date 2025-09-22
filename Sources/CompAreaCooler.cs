@@ -171,6 +171,9 @@ namespace MoreVanillaStructure
             Map currentMap = parent.Map;
             if (currentMap == null) return;
 
+            float cellTemperature = parent.Position.GetTemperature(currentMap);
+            if (cellTemperature > Props.heatPushMinTemperature) GenTemperature.PushHeat(parent.Position, currentMap, heatPushPerRare);
+
             for (int i = cellMin.x; i <= cellMax.x; i++)
             {
                 for (int j = cellMin.z; j <= cellMax.z; j++)
@@ -206,9 +209,6 @@ namespace MoreVanillaStructure
             if (!location.InBounds(currentMap)) return;
             Building currentBuilding = location.GetEdifice(currentMap);
             if (currentBuilding != null && currentBuilding.def.passability == Traversability.Impassable) return;
-
-            float cellTemperature = location.GetTemperature(currentMap);
-            if (cellTemperature > Props.heatPushMinTemperature) GenTemperature.PushHeat(location, currentMap, heatPushPerRare);
 
             foreach(Thing currentThing in location.GetThingList(currentMap))
             {

@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompAreaCooler.cs" />
+    <Compile Include="CompEmergencyDrafter.cs" />
     <Compile Include="Initiator.cs" />
     <Compile Include="JobDriver_PlayDarts.cs" />
     <Compile Include="JobDriver_WatchFace.cs" />
