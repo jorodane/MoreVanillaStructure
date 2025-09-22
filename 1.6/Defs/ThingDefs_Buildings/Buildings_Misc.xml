@@ -275,7 +275,7 @@
 		<designationCategory>Misc</designationCategory>
 		<comps>
 			<li Class="MoreVanillaStructure.CompProperties_EmergencyDrafter">
-				<assignableClass>MoreVanillaStructure.CompEmergencyDrafter</assignableClass>
+				<compClass>MoreVanillaStructure.CompEmergencyDrafter</compClass>
 			</li>
 		</comps>
 		<inspectorTabs>
