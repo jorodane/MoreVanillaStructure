@@ -2,18 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
-using Verse.AI;
-using Verse.Noise;
 
 namespace MoreVanillaStructure
 {
     public class CompProperties_AreaCooler : CompProperties
     {
-        public float heatPerSecond;
-        public float heatPushMinTemperature;
+        public float heatPerSecond_Gentle;
+        public float heatPerSecond_Light;
+        public float heatPerSecond_Strong;
+		public float energyByLevel_Gentle;
+		public float energyByLevel_Light;
+		public float energyByLevel_Strong;
+		public float heatPushMinTemperature;
         public const int tickRare = 250;
 
-        public CompProperties_AreaCooler()
+		public float GetHeatPerSecond(int level)
+		{
+			switch (level)
+			{
+				default: return heatPerSecond_Gentle;
+				case 1: return heatPerSecond_Light;
+				case 2: return heatPerSecond_Strong;
+			}
+		}
+
+		public float GetenergyPerSecond(int level)
+		{
+			switch (level)
+			{
+				default: return energyByLevel_Gentle;
+				case 1: return energyByLevel_Light;
+				case 2: return energyByLevel_Strong;
+			}
+		}
+
+		public CompProperties_AreaCooler()
         {
             compClass = typeof(CompAreaCooler);
         }
@@ -27,24 +50,108 @@ namespace MoreVanillaStructure
         CompFlickable flick;
         IntVec3 cellMin, cellMax;
 
-        float heatPushPerRareOrigin;
+		static Color selectedButtonColor = new Color(0.6f, 1f, 0.6f);
+
+		float heatPushPerRare;
         int level = 0;
         bool isInstalled = false;
 
-        public bool isOn => (power != null && power.PowerOn) && (flick == null || flick.SwitchIsOn);
+        public bool IsOn => (power != null && power.PowerOn) && (flick == null || flick.SwitchIsOn);
+
+		public string GetIconPath(int level)
+		{
+			switch (level)
+			{
+				default: return "UI/Commands/Set_Gentle";
+				case 1: return "UI/Commands/Set_Light";
+				case 2: return "UI/Commands/Set_Strong";
+			}
+		}
+
+
+		public string GetLevelNamedArgument(int level)
+		{
+			switch (level)
+			{
+				default: return "MVS_Fan_Gentle";
+				case 1: return "MVS_Fan_Light";
+				case 2: return "MVS_Fan_Strong";
+			}
+		}
+
+		public string GetLevelString(int level) => GetLevelNamedArgument(level).Translate();
+
+		public string GetLevelDescriptionString(int level)
+		{
+			return "MVS_Fan_Level_Desc".Translate(GetLevelString(level).Named("CurrentLevel"));
+		}
+
+		public string GetLevelChangeButtonString(int nextLevel)
+		{
+			return "MVS_Fan_Button_Desc".Translate(GetLevelString(nextLevel).Named("NextLevel"), GetLevelString(level).Named("CurrentLevel"));
+		}
+
+		public Command_Action GetLevelChangeButtonAction(int wantLevel)
+		{
+			Command_Action result = new Command_Action()
+			{
+				defaultLabel = GetLevelString(wantLevel),
+				defaultDesc = GetLevelChangeButtonString(wantLevel),
+				icon = ContentFinder<Texture2D>.Get(GetIconPath(wantLevel), true),
+				groupKey = 4000,
+				action = () => SetLevel(wantLevel)
+			};
+
+			if(level == wantLevel)
+			{
+				result.defaultIconColor = selectedButtonColor;
+			}
+
+			return result;
+		}
+
+		public int SetLevel(int newLevel)
+		{
+			level = newLevel;
+			if(power != null) power.PowerOutput = -Props.GetenergyPerSecond(level);
+            heatPushPerRare = Props.GetHeatPerSecond(level) * (CompProperties_AreaCooler.tickRare / 60f);
+			return level;
+		}
 
         public override void Initialize(CompProperties props)
         {
             base.Initialize(props);
             power = parent.TryGetComp<CompPowerTrader>();
             flick = parent.TryGetComp<CompFlickable>();
-            heatPushPerRareOrigin = Props.heatPerSecond * (CompProperties_AreaCooler.tickRare / 60f);
-        }
+			SetLevel(level);
+		}
 
-        public override void PostSpawnSetup(bool respawningAfterLoad)
+		public override string CompInspectStringExtra()
+		{
+			string result = $"{base.CompInspectStringExtra()}{GetLevelDescriptionString(level)}";
+
+			return result;
+		}
+
+		public override void PostExposeData()
+		{
+			base.PostExposeData();
+			Scribe_Values.Look(ref level, "FanLevel", 0);
+			SetLevel(level);
+		}
+
+		public override IEnumerable<Gizmo> CompGetGizmosExtra()
+		{
+			for(int i = 0;i < 3; i++)
+			{
+				yield return GetLevelChangeButtonAction(i);
+			}
+		}
+
+		public override void PostSpawnSetup(bool respawningAfterLoad)
         {
             base.PostSpawnSetup(respawningAfterLoad);
-            RefreshCoolingCell();
+			RefreshCoolingCell();
             isInstalled = true;
         }
 
@@ -58,7 +165,7 @@ namespace MoreVanillaStructure
         public override void CompTickRare()
         {
             base.CompTickRare();
-            if (!(isInstalled && isOn)) return;
+            if (!(isInstalled && IsOn)) return;
 
             Map currentMap = parent.Map;
             if (currentMap == null) return;
@@ -102,15 +209,15 @@ namespace MoreVanillaStructure
             if (currentBuilding != null && currentBuilding.def.passability == Traversability.Impassable) return;
 
             float cellTemperature = location.GetTemperature(currentMap);
-            if (cellTemperature <= Props.heatPushMinTemperature) return;
-            GenTemperature.PushHeat(location, currentMap, heatPushPerRareOrigin);
+            if (cellTemperature > Props.heatPushMinTemperature) GenTemperature.PushHeat(location, currentMap, heatPushPerRare);
 
             foreach(Thing currentThing in location.GetThingList(currentMap))
             {
                 if(currentThing is Pawn asPawn)
                 {
                     Hediff fanBreeze = asPawn.health.GetOrAddHediff(MoreVanillaStructureDefs.FanBreeze);
-                    fanBreeze.Severity = level * 0.5f;
+					fanBreeze.ageTicks = 0;
+                    fanBreeze.Severity = 0.1f + (level * 0.4f);
                 }
             }
         }

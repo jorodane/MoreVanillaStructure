@@ -8,6 +8,6 @@ namespace MoreVanillaStructure
 {
     internal class JoyGiver_WatchFace : JoyGiver_WatchBuilding
     {
-        
+
     }
 }

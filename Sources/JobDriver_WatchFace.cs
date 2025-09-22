@@ -19,7 +19,7 @@ namespace MoreVanillaStructure
         {
             totalTick = 0;
             float beauty = pawn.GetStatValue(StatDefOf.Beauty);
-            float multiplier = Mathf.Max(0.5f, beauty);
+            float multiplier = Mathf.Max(0.25f, 0.5f + (beauty * 0.5f));
             float limitTick = MaxTick * multiplier;
             this.FailOnDespawnedOrNull(MirrorIndex);
             Building mirror = job.GetTarget(MirrorIndex).Thing as Building;

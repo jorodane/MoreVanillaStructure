@@ -562,8 +562,6 @@
 				<volume>(0.1,0.2,0.1)</volume>
 				<offset>(0, 0, -0.4)</offset>
 			</shadowData>
-			<!--drawSize>1</drawSize-->
-			<!--drawOffset>(0,-1,0)</drawOffset-->
 			<allowFlip>true</allowFlip>
 		</graphicData>
 		<building>
@@ -571,7 +569,6 @@
 			<watchBuildingStandRectWidth>3</watchBuildingStandRectWidth>
 			<watchBuildingInSameRoom>true</watchBuildingInSameRoom>
 		</building>
-		<!--uiIconScale>1</uiIconScale-->
 		<defaultPlacingRot>South</defaultPlacingRot>
 		<rotatable>true</rotatable>
 		<altitudeLayer>Building</altitudeLayer>
@@ -618,13 +615,16 @@
 				<shortCircuitInRain>true</shortCircuitInRain>
 			</li>
 			<li Class="CompProperties_Flickable"/>
-			<li Class="CompProperties_TempControl">
-				<energyPerSecond>30</energyPerSecond>
-			</li>
 			<li Class="MoreVanillaStructure.CompProperties_AreaCooler">
 				<compClass>MoreVanillaStructure.CompAreaCooler</compClass>
-				<heatPerSecond>-5</heatPerSecond>
-				<heatPushMinTemperature>17</heatPushMinTemperature>
+        <heatPerSecond_Gentle>-3</heatPerSecond_Gentle>
+        <heatPerSecond_Light>-5</heatPerSecond_Light>
+        <heatPerSecond_Strong>-8</heatPerSecond_Strong>
+        <energyByLevel_Gentle>50</energyByLevel_Gentle>
+        <energyByLevel_Light>100</energyByLevel_Light>
+        <energyByLevel_Strong>200</energyByLevel_Strong>
+        <heatPushMinTemperature>17</heatPushMinTemperature>
+        <!--heatPushMaxTemperature>35</heatPushMaxTemperature-->
 			</li>
 			<li Class="CompProperties_Breakdownable"/>
 		</comps>
