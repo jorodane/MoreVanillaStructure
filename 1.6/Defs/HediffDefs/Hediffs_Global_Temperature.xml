@@ -23,7 +23,7 @@
 			</li>
 			<li>
 				<label>light</label>
-				<minSeverity>0.34</minSeverity>
+				<minSeverity>0.2</minSeverity>
 				<statOffsets>
 					<ComfyTemperatureMin>+5</ComfyTemperatureMin>
 					<ComfyTemperatureMax>+5</ComfyTemperatureMax>
@@ -31,7 +31,7 @@
 			</li>
 			<li>
 				<label>strong</label>
-				<minSeverity>0.67</minSeverity>
+				<minSeverity>0.6</minSeverity>
 				<statOffsets>
 					<ComfyTemperatureMin>+10</ComfyTemperatureMin>
 					<ComfyTemperatureMax>+10</ComfyTemperatureMax>

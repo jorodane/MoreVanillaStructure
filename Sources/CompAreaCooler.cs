@@ -112,13 +112,18 @@ namespace MoreVanillaStructure
 		public int SetLevel(int newLevel)
 		{
 			level = newLevel;
-			if (Power != null)
-			{
-				Power.PowerOutput = -Props.GetEnergyPerSecond(level);
-			}
+			UpdatePowerOutput();
             heatPushPerRare = Props.GetHeatPerSecond(level) * (CompProperties_AreaCooler.tickRare / 60f);
 			return level;
 		}
+
+		public void UpdatePowerOutput()
+        {
+            if (Power != null)
+            {
+                Power.PowerOutput = -Props.GetEnergyPerSecond(level);
+            }
+        }
 
 		public override string CompInspectStringExtra()
 		{
@@ -161,6 +166,7 @@ namespace MoreVanillaStructure
         {
             base.CompTickRare();
             if (!(isInstalled && IsOn)) return;
+            UpdatePowerOutput();
 
             Map currentMap = parent.Map;
             if (currentMap == null) return;
@@ -215,7 +221,7 @@ namespace MoreVanillaStructure
 						{
 							disappear.ticksToDisappear = disappear.disappearsAfterTicks;
 						}
-						fanBreeze.Severity = 0.1f + (level * 0.4f);
+						fanBreeze.Severity = Mathf.Lerp(fanBreeze.Severity, 0.1f + (level * 0.4f), 0.1f);
 					}
                 }
             }
