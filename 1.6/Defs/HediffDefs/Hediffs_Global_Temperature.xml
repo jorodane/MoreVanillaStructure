@@ -17,24 +17,24 @@
 			<li>
 				<label>gentle</label>
 				<statOffsets>
-					<ComfyTemperatureMin>+1</ComfyTemperatureMin>
-					<ComfyTemperatureMax>+1</ComfyTemperatureMax>
+					<ComfyTemperatureMin>+3</ComfyTemperatureMin>
+					<ComfyTemperatureMax>+3</ComfyTemperatureMax>
 				</statOffsets>
 			</li>
 			<li>
 				<label>light</label>
 				<minSeverity>0.34</minSeverity>
 				<statOffsets>
-					<ComfyTemperatureMin>+3</ComfyTemperatureMin>
-					<ComfyTemperatureMax>+3</ComfyTemperatureMax>
+					<ComfyTemperatureMin>+5</ComfyTemperatureMin>
+					<ComfyTemperatureMax>+5</ComfyTemperatureMax>
 				</statOffsets>
 			</li>
 			<li>
 				<label>strong</label>
 				<minSeverity>0.67</minSeverity>
 				<statOffsets>
-					<ComfyTemperatureMin>+5</ComfyTemperatureMin>
-					<ComfyTemperatureMax>+5</ComfyTemperatureMax>
+					<ComfyTemperatureMin>+10</ComfyTemperatureMin>
+					<ComfyTemperatureMax>+10</ComfyTemperatureMax>
 				</statOffsets>
 			</li>
 		</stages>

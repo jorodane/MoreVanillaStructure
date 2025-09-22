@@ -26,7 +26,7 @@ namespace MoreVanillaStructure
 			}
 		}
 
-		public float GetenergyPerSecond(int level)
+		public float GetEnergyPerSecond(int level)
 		{
 			switch (level)
 			{
@@ -46,8 +46,10 @@ namespace MoreVanillaStructure
     public class CompAreaCooler : ThingComp
     {
         public CompProperties_AreaCooler Props => (CompProperties_AreaCooler)props;
-        CompPowerTrader power;
-        CompFlickable flick;
+        CompPowerTrader _power;
+		CompPowerTrader Power => _power = _power ?? parent.TryGetComp<CompPowerTrader>();
+        CompFlickable _flick;
+		CompFlickable Flick => _flick =_flick ?? parent.TryGetComp<CompFlickable>();
         IntVec3 cellMin, cellMax;
 
 		static Color selectedButtonColor = new Color(0.6f, 1f, 0.6f);
@@ -56,7 +58,7 @@ namespace MoreVanillaStructure
         int level = 0;
         bool isInstalled = false;
 
-        public bool IsOn => (power != null && power.PowerOn) && (flick == null || flick.SwitchIsOn);
+        public bool IsOn => (Power != null && Power.PowerOn) && (Flick == null || Flick.SwitchIsOn);
 
 		public string GetIconPath(int level)
 		{
@@ -102,10 +104,7 @@ namespace MoreVanillaStructure
 				action = () => SetLevel(wantLevel)
 			};
 
-			if(level == wantLevel)
-			{
-				result.defaultIconColor = selectedButtonColor;
-			}
+			if(level == wantLevel){result.defaultIconColor = selectedButtonColor;}
 
 			return result;
 		}
@@ -113,17 +112,12 @@ namespace MoreVanillaStructure
 		public int SetLevel(int newLevel)
 		{
 			level = newLevel;
-			if(power != null) power.PowerOutput = -Props.GetenergyPerSecond(level);
+			if (Power != null)
+			{
+				Power.PowerOutput = -Props.GetEnergyPerSecond(level);
+			}
             heatPushPerRare = Props.GetHeatPerSecond(level) * (CompProperties_AreaCooler.tickRare / 60f);
 			return level;
-		}
-
-        public override void Initialize(CompProperties props)
-        {
-            base.Initialize(props);
-            power = parent.TryGetComp<CompPowerTrader>();
-            flick = parent.TryGetComp<CompFlickable>();
-			SetLevel(level);
 		}
 
 		public override string CompInspectStringExtra()
@@ -136,13 +130,13 @@ namespace MoreVanillaStructure
 		public override void PostExposeData()
 		{
 			base.PostExposeData();
-			Scribe_Values.Look(ref level, "FanLevel", 0);
+			Scribe_Values.Look(ref level, "FanLevel", 0, true);
 			SetLevel(level);
 		}
 
 		public override IEnumerable<Gizmo> CompGetGizmosExtra()
 		{
-			for(int i = 0;i < 3; i++)
+			for(int i = 0; i < 3; i++)
 			{
 				yield return GetLevelChangeButtonAction(i);
 			}
@@ -152,8 +146,9 @@ namespace MoreVanillaStructure
         {
             base.PostSpawnSetup(respawningAfterLoad);
 			RefreshCoolingCell();
+			SetLevel(level);
             isInstalled = true;
-        }
+		}
 
         public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)
         {
@@ -190,16 +185,14 @@ namespace MoreVanillaStructure
             IntVec3 right = parent.Rotation.Rotated(RotationDirection.Clockwise).FacingCell;
             IntVec3 position = parent.Position;
 
-            IntVec3 forwardMax = position + (forward * depth.max);
-            IntVec3 forwardMin = position + (forward * depth.min);
-            IntVec3 rightMax = position + (right * halfWidth);
-            IntVec3 rightMin = position - (right * (width - 1 - halfWidth));
+			IntVec3 leftForward = position + (forward * depth.TrueMax) - (right * (width - 1 - halfWidth));
+			IntVec3 rightBack = position + (forward * (depth.TrueMin)) + (right * halfWidth);
 
-            cellMin.x = Mathf.Min(forwardMax.x, forwardMin.x, rightMax.x, rightMin.x);
-            cellMin.z = Mathf.Min(forwardMax.z, forwardMin.z, rightMax.z, rightMin.z);
-            cellMax.x = Mathf.Max(forwardMax.x, forwardMin.x, rightMax.x, rightMin.x);
-            cellMax.z = Mathf.Max(forwardMax.z, forwardMin.z, rightMax.z, rightMin.z);
-        }
+			cellMin.x = Mathf.Min(leftForward.x, rightBack.x);
+			cellMax.x = Mathf.Max(leftForward.x, rightBack.x);
+			cellMin.z = Mathf.Min(leftForward.z, rightBack.z);
+			cellMax.z = Mathf.Max(leftForward.z, rightBack.z);
+		}
 
         public void InCellAction(IntVec3 location)
         {
@@ -216,8 +209,14 @@ namespace MoreVanillaStructure
                 if(currentThing is Pawn asPawn)
                 {
                     Hediff fanBreeze = asPawn.health.GetOrAddHediff(MoreVanillaStructureDefs.FanBreeze);
-					fanBreeze.ageTicks = 0;
-                    fanBreeze.Severity = 0.1f + (level * 0.4f);
+					if (fanBreeze != null)
+					{
+						if (fanBreeze.TryGetComp(out HediffComp_Disappears disappear))
+						{
+							disappear.ticksToDisappear = disappear.disappearsAfterTicks;
+						}
+						fanBreeze.Severity = 0.1f + (level * 0.4f);
+					}
                 }
             }
         }
