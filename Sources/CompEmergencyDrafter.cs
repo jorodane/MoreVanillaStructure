@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -15,7 +16,10 @@ namespace MoreVanillaStructure
         static readonly Vector2 tabSize = new Vector2(300f,480f);
         const string tabNameKey = "MVS_Tab_DraftSelecter";
 
-        Vector2 scrollPos;
+        const float headerHeight = 28f;
+        const float rowHeight = 26f;
+
+        Vector2 scrollPosition;
 
         public ITab_DraftSetting()
         {
@@ -38,10 +42,28 @@ namespace MoreVanillaStructure
             Text.Font = GameFont.Small;
 
             List<Pawn> colonists = currentMap.mapPawns.FreeColonistsSpawned;
-            foreach(Pawn pawn in colonists)
-            {
+            Rect listRect = new Rect(windowRect.x, headerHeight + 6.0f, windowRect.width, windowRect.height - headerHeight - 6.0f);
+            Rect viewRect = new Rect(0f, 0f, listRect.width - 16.0f, colonists.Count * rowHeight);
 
+            IEnumerable<Pawn> selectedPawn = Find.Selector.SelectedObjectsListForReading.OfType<Pawn>();
+
+            Widgets.BeginScrollView(listRect, ref scrollPosition, viewRect);
+            Rect rowRect = new Rect(0f, 0f, viewRect.width, rowHeight);
+            Rect checkRect = new Rect(0f,0f,24f,24f);
+            foreach (Pawn currentPawn in colonists)
+            {
+                Widgets.DrawHighlightIfMouseover(rowRect);
+                if(selectedPawn.Contains(currentPawn)) Widgets.DrawLightHighlight(rowRect);
+
+                bool isSelected = drafter.IsSelected(currentPawn);
+                checkRect.x = rowRect.x;
+                checkRect.y = rowRect.y;
+
+                Widgets.Checkbox(checkRect.position,ref isSelected);
+
+                rowRect.y += rowHeight;
             }
+            Widgets.EndScrollView();
         }
     }
 
@@ -72,6 +94,8 @@ namespace MoreVanillaStructure
         public bool HasSelectedPawn => selectedPawn.Count > 0;
         public bool HasDraftableSelectedPawn => selectedPawn.Any((current) => current != null && current.IsDraftable());
 
+        public bool IsSelected(Pawn pawn) => selectedPawn.Contains(pawn);
+
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
         {
             yield return new Command_Action
@@ -97,6 +121,7 @@ namespace MoreVanillaStructure
         {
             if (!HasSelectedPawn)
             {
+
             }
         }
 
