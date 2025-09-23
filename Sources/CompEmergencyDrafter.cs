@@ -9,6 +9,7 @@ namespace MoreVanillaStructure
     public static class Extension_Pawn
     {
         public static bool IsDraftable(this Pawn pawn) => pawn.Spawned && pawn.Faction == Faction.OfPlayer && pawn.drafter != null && !pawn.DeadOrDowned && !pawn.InMentalState;
+		public static bool IsValidArea(this Area area, Map map) => area.Map == map && area.TrueCount > 0;
     }
 
     public class ITab_DraftSetting : ITab
@@ -20,7 +21,7 @@ namespace MoreVanillaStructure
         const string tabNameKey = "MVS_Tab_DraftSelecter";
 		const float headerHeight = 28f;
 		const float headerPadding = 12.0f;
-		const float listPadding = 15.0f;
+		const float listPadding = 5.0f;
 		const float viewPadding = 16.0f;
 		const float rowPadding = 0.0f;
         const float rowHeight = 30f;
@@ -31,6 +32,7 @@ namespace MoreVanillaStructure
 
 
 		public string GetDraftAllString() => "MVS_Button_DraftAll".Translate();
+		public string GetDraftAreaString() => "MVS_Button_DraftArea".Translate();
 
 		public ITab_DraftSetting()
         {
@@ -57,20 +59,26 @@ namespace MoreVanillaStructure
 			float currentHeight = headerHeight + headerPadding;
 
 			List<Pawn> colonists = Find.ColonistBar.GetColonistsInOrder();
-			Rect listRect = new Rect(windowRect.x, currentHeight, windowRect.width, windowRect.height - currentHeight - listPadding);
+			Rect listRect = new Rect(windowRect.x, currentHeight, windowRect.width, 0.0f);
             Rect viewRect = new Rect(0f, 0f, listRect.width - viewPadding, colonists.Count * rowHeight);
 
             Rect rowRect = new Rect(rowPadding, 0f, viewRect.width, rowHeight);
             Rect pawnInfoRect = new Rect(rowRect.x, rowRect.y, viewRect.width - checkSize - rowPadding, rowHeight);
 			Rect checkRect = new Rect(viewRect.width - checkSize, rowRect.y, checkSize, checkSize);
 
-			Rect draftAllRect = pawnInfoRect;
-			draftAllRect.x = windowRect.width - 100.0f;
-			draftAllRect.width = 76.0f;
-			draftAllRect.y = currentHeight;
-			listRect.y = currentHeight += draftAllRect.height;
+            Rect draftAreaRect = pawnInfoRect;
+            draftAreaRect.x = viewPadding;
+            draftAreaRect.width = windowRect.width - 150.0f;
+            draftAreaRect.y = currentHeight;
 
-			Rect pawnPortraitRect = pawnInfoRect;
+            Rect draftAllRect = draftAreaRect;
+			draftAllRect.x = draftAreaRect.x + draftAreaRect.width + viewPadding;
+			draftAllRect.width = windowRect.width - draftAllRect.x - viewPadding;
+
+			listRect.y = currentHeight += draftAllRect.height + viewPadding;
+			listRect.height = windowRect.height - currentHeight - listPadding;
+
+            Rect pawnPortraitRect = pawnInfoRect;
 			pawnPortraitRect.width = rowHeight;
 			Rect pawnDetailRect = pawnPortraitRect;
 			pawnDetailRect.x = pawnPortraitRect.width;
@@ -81,6 +89,10 @@ namespace MoreVanillaStructure
 			pawnWeaponRect.x = pawnNameRect.x + pawnNameRect.width;
 
 			bool wasAllSelected = allSelected;
+			if(Widgets.ButtonText(draftAreaRect, GetDraftAreaString()))
+			{
+
+			}
 			Widgets.Label(draftAllRect, GetDraftAllString());
 			Widgets.Checkbox(draftAllRect.position + (Vector2.right * draftAllRect.width), ref allSelected);
 			if (wasAllSelected != allSelected) drafter.SetSelected(colonists, allSelected);
@@ -102,7 +114,8 @@ namespace MoreVanillaStructure
 				bool tempSelected = isSelected;
 				checkRect.y = rowRect.y;
 				GUI.DrawTexture(pawnPortraitRect, currentPortrait);
-				TooltipHandler.TipRegion(pawnPortraitRect, new TipSignal($"{currentPawn.LabelCap}\n{currentPawn.GetInspectString()}", currentPawn.thingIDNumber));
+				TipSignal currentPawnTip = new TipSignal($"{currentPawn.LabelCap}\n{currentPawn.GetInspectString()}", currentPawn.thingIDNumber);
+                TooltipHandler.TipRegion(pawnPortraitRect, currentPawnTip);
 				Widgets.InfoCardButton(pawnDetailRect.x, pawnDetailRect.y, currentPawn);
 				if(weapon != null)
 				{
@@ -110,6 +123,7 @@ namespace MoreVanillaStructure
 					TooltipHandler.TipRegion(pawnWeaponRect, new TipSignal(weapon.LabelCapNoCount, weapon.thingIDNumber));
 				}
 				Widgets.Label(pawnNameRect, currentPawn.LabelCap);
+                TooltipHandler.TipRegion(pawnNameRect, currentPawnTip);
                 Widgets.Checkbox(checkRect.position, ref tempSelected);
 				if(currentEvent.isMouse && checkRect.Contains(currentEvent.mousePosition) && isLeftClick)
 				{
@@ -132,7 +146,9 @@ namespace MoreVanillaStructure
 					{
 						case 0:
 							CameraJumper.TryJump(currentPawn);
-							break;
+                            Find.Selector.ClearSelection();
+                            Find.Selector.Select(currentPawn, playSound: true);
+                            break;
 					}
 					currentEvent.Use();
 				}
@@ -170,9 +186,17 @@ namespace MoreVanillaStructure
 
         List<Pawn> selectedPawn = new List<Pawn>();
 
+		Area _draftArea;
+        public Area DraftArea
+        {
+            get => HasValidDraftArea() ? _draftArea : null;
+            set => _draftArea = value;
+        }
+
         public bool HasSelectedPawn => selectedPawn.Count > 0;
         public bool HasDraftableSelectedPawn => selectedPawn.Any((current) => current != null && current.IsDraftable());
 
+		public bool HasValidDraftArea() => _draftArea != null && _draftArea.IsValidArea(parent.Map);
         public bool IsSelected(Pawn pawn) => selectedPawn.Contains(pawn);
 		public void ToggleSelected(Pawn pawn) { if (IsSelected(pawn)) selectedPawn.Remove(pawn); else selectedPawn.Add(pawn); }
 		public void SetSelected(Pawn pawn, bool value) { if (value) { if(!IsSelected(pawn))selectedPawn.Add(pawn); } else selectedPawn.Remove(pawn); }
@@ -182,13 +206,16 @@ namespace MoreVanillaStructure
 			if (value) selectedPawn.AddRange(newList); 
 		}
 
+
 		public override void PostExposeData()
 		{
 			base.PostExposeData();
 			Scribe_Collections.Look(ref selectedPawn, "SelectedPawn", LookMode.Reference);
+			Scribe_References.Look(ref _draftArea, "DraftArea");
 			if(Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
 				selectedPawn?.RemoveAll((currentPawn) => currentPawn.DestroyedOrNull());
+				if (!HasValidDraftArea()) DraftArea = null;
 			}
 		}
 
@@ -211,6 +238,28 @@ namespace MoreVanillaStructure
                 icon = GetCallToArms4All_MenuIcon(),
                 action = OnCallToArms4All
             };
+        }
+
+        private IntVec3 GetDraftableSpot()
+        {
+            var map = parent.Map;
+            if (map == null) return parent.Position;
+
+            IntVec3 spot = parent.Position;
+
+            if (DraftArea != null)
+            {
+                IntVec3 c;
+                if (CellFinder.TryFindRandomCellNear(parent.Position, map, 24,
+                        x => DraftArea[x] && x.Standable(map) && map.reachability.CanReachColony(x),
+                        out c))
+				{
+                    return c;
+				}
+            }
+
+            CellFinder.TryFindRandomCellNear(parent.Position, map, 8, x => x.Standable(map), out spot);
+            return spot;
         }
 
         public void OnCallToArms4Selected()

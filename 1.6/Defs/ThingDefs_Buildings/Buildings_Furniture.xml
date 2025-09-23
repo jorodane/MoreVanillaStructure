@@ -342,6 +342,7 @@
 		</building>
 		<drawStyleCategory>Floors</drawStyleCategory>
 		<costStuffCount>20</costStuffCount>
+		<rotatable>false</rotatable>
 	</ThingDef>
 
 
@@ -353,6 +354,7 @@
 		</replaceTags>
 		<graphicData>
 			<graphicClass>Graphic_Appearances</graphicClass>
+			<shaderType>CutoutComplex</shaderType>
 			<linkType>CornerFiller</linkType>
 			<texPath>Things/Building/Linked/LinkedCoveredTable</texPath>
 			<linkFlags>
@@ -360,7 +362,7 @@
 			</linkFlags>
 		</graphicData>
 		<castEdgeShadows>true</castEdgeShadows>
-		<uiIconPath>Things/Building/Linked/LinkedTable_MenuIcon</uiIconPath>
+		<uiIconPath>Things/Building/Linked/LinkedCoveredTable_MenuIcon</uiIconPath>
 		<statBases>
 			<MaxHitPoints>40</MaxHitPoints>
 			<WorkToBuild>400</WorkToBuild>
@@ -370,11 +372,19 @@
 		</statBases>
 		<building>
 			<blueprintGraphicData>
-				<texPath>Things/Building/Linked/LinkedTable_Blueprint_Atlas</texPath>
+				<texPath>Things/Building/Linked/LinkedCoveredTable_Blueprint_Atlas</texPath>
 			</blueprintGraphicData>
 		</building>
 		<drawStyleCategory>Floors</drawStyleCategory>
+		<costList>
+			<WoodLog>15</WoodLog>
+		</costList>
+		<stuffCategories>
+			<li>Fabric</li>
+			<li>Leathery</li>
+		</stuffCategories>
 		<costStuffCount>20</costStuffCount>
+		<rotatable>false</rotatable>
 	</ThingDef>
 	
 	

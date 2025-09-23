@@ -2,23 +2,22 @@
 
 <LanguageData>
 
-
-
 	<MVS_Fan_Level_Desc>바람 세기 : {CurrentLevel}</MVS_Fan_Level_Desc>
 	<MVS_Fan_Button_Desc>{NextLevel}으로 변경 (현재 : {CurrentLevel})</MVS_Fan_Button_Desc>
+	<MVS_Fan_Gentle>미풍</MVS_Fan_Gentle>
+	<MVS_Fan_Light>약풍</MVS_Fan_Light>
+	<MVS_Fan_Strong>강풍</MVS_Fan_Strong>
+	
+	
 	<MVS_CallToArms_Selected_Lable>긴급 소집 (선택)</MVS_CallToArms_Selected_Lable>
 	<MVS_CallToArms_Not_Selected_Description>소집을 위해 선택된 인원이 없습니다.</MVS_CallToArms_Not_Selected_Description>
 	<MVS_CallToArms_HasNot_Draftable_Description>소집 가능한 인원이 없습니다.</MVS_CallToArms_HasNot_Draftable_Description>
 	<MVS_CallToArms_Selected_Description>이 건물에 할당된 정착민들을 소집합니다.</MVS_CallToArms_Selected_Description>
 	<MVS_CallToArms_All_Lable>긴급 소집 (모두)</MVS_CallToArms_All_Lable>
 	<MVS_CallToArms_All_Description>모든 정착민들을 소집합니다.</MVS_CallToArms_All_Description>
-
-
-	<MVS_Fan_Gentle>미풍</MVS_Fan_Gentle>
-	<MVS_Fan_Light>약풍</MVS_Fan_Light>
-	<MVS_Fan_Strong>강풍</MVS_Fan_Strong>
-	<MVS_Button_DraftAll>전체 소집</MVS_Button_DraftAll>
-
+	
 	<MVS_Tab_DraftSelecter>소집</MVS_Tab_DraftSelecter>
+	<MVS_Button_DraftAll>전체 소집</MVS_Button_DraftAll>
+	<MVS_Button_DraftArea>구역 설정 없음 (주변)</MVS_Button_DraftArea>
 
 </LanguageData>

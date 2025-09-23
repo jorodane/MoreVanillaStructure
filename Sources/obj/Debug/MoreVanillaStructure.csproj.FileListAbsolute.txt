@@ -2,7 +2,6 @@ D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\Debug\MoreVanillaStructure.pdb
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\Debug\Assembly-CSharp.dll
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\Debug\UnityEngine.CoreModule.dll
-D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\Debug\UnityEngine.TextRenderingModule.dll
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\Debug\NAudio.dll
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\Debug\NVorbis.dll
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\MoreVanillaStructure\Sources\bin\Debug\UnityEngine.AudioModule.dll
