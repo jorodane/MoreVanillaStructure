@@ -345,6 +345,43 @@
 	</ThingDef>
 
 
+	<ThingDef ParentName="TableGatherSpotBase" Name ="LinkedCoveredTable">
+		<defName>LinkedCoveredTable</defName>
+		<label>linked covered table</label>
+		<replaceTags>
+			<li>Table</li>
+		</replaceTags>
+		<graphicData>
+			<graphicClass>Graphic_Appearances</graphicClass>
+			<linkType>CornerFiller</linkType>
+			<texPath>Things/Building/Linked/LinkedCoveredTable</texPath>
+			<linkFlags>
+				<li>Custom7</li>
+			</linkFlags>
+		</graphicData>
+		<castEdgeShadows>true</castEdgeShadows>
+		<uiIconPath>Things/Building/Linked/LinkedTable_MenuIcon</uiIconPath>
+		<statBases>
+			<MaxHitPoints>40</MaxHitPoints>
+			<WorkToBuild>400</WorkToBuild>
+			<Mass>2</Mass>
+			<Flammability>1.0</Flammability>
+			<Beauty>0.3</Beauty>
+		</statBases>
+		<building>
+			<blueprintGraphicData>
+				<texPath>Things/Building/Linked/LinkedTable_Blueprint_Atlas</texPath>
+			</blueprintGraphicData>
+		</building>
+		<drawStyleCategory>Floors</drawStyleCategory>
+		<costStuffCount>20</costStuffCount>
+	</ThingDef>
+	
+	
+	
+	
+
+
 	<ThingDef Abstract = "true" ParentName="FurnitureWithQualityBase" Name ="LinkedPlantPotBase">
 		<thingClass>Building_PlantGrower</thingClass>
 		<graphicData>
