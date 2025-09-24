@@ -3,13 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
-namespace MoreVanillaStructure
+namespace CallToArms
 {
     public static class Extension_Pawn
     {
-        public static bool IsDraftable(this Pawn pawn) => pawn.Spawned && pawn.Faction == Faction.OfPlayer && pawn.drafter != null && !pawn.DeadOrDowned && !pawn.InMentalState;
+        public static bool IsDraftable(this Pawn target) => target.Spawned && target.Faction == Faction.OfPlayer && target.drafter != null && !target.DeadOrDowned && !target.InMentalState;
 		public static bool IsValidArea(this Area area, Map map) => area.Map == map && area.TrueCount > 0;
+		public static bool IsCarryingBaby(this Pawn target)
+		{
+			Pawn carriedPawn = target.carryTracker?.CarriedThing as Pawn;
+			if(carriedPawn != null && carriedPawn.RaceProps.Humanlike)
+			{
+				DevelopmentalStage stage = carriedPawn.ageTracker?.CurLifeStage?.developmentalStage ?? DevelopmentalStage.None;
+
+				return stage <= DevelopmentalStage.Baby;
+			}
+			return false;
+		}
     }
 
     public class ITab_DraftSetting : ITab
@@ -18,9 +30,9 @@ namespace MoreVanillaStructure
 		static readonly Vector2 portraitSize = new Vector2(rowHeight, rowHeight);
 		bool? mouseSelected = null;
 
-        const string tabNameKey = "MVS_Tab_DraftSelecter";
+        const string tabNameKey = "CallToArms_Tab_DraftSelecter";
 		const float headerHeight = 28f;
-		const float headerPadding = 12.0f;
+		const float headerPadding = 16.0f;
 		const float listPadding = 5.0f;
 		const float viewPadding = 16.0f;
 		const float rowPadding = 0.0f;
@@ -31,8 +43,8 @@ namespace MoreVanillaStructure
 		bool allSelected = false;
 
 
-		public string GetDraftAllString() => "MVS_Button_DraftAll".Translate();
-		public string GetDraftAreaString() => "MVS_Button_DraftArea".Translate();
+		public string GetDraftAllString() => "CallToArms_Button_DraftAll".Translate();
+		public string GetDraftAreaEmptyString() => "CallToArms_Button_DraftAreaEmpty".Translate();
 
 		public ITab_DraftSetting()
         {
@@ -89,9 +101,19 @@ namespace MoreVanillaStructure
 			pawnWeaponRect.x = pawnNameRect.x + pawnNameRect.width;
 
 			bool wasAllSelected = allSelected;
-			if(Widgets.ButtonText(draftAreaRect, GetDraftAreaString()))
+			string draftAreaEmpty = GetDraftAreaEmptyString();
+			string draftButtonText = drafter.DraftArea?.Label ?? draftAreaEmpty;
+			if (Widgets.ButtonText(draftAreaRect, draftButtonText))
 			{
+				List<FloatMenuOption> areaOptions = new List<FloatMenuOption>();
+				areaOptions.Add(new FloatMenuOption(draftAreaEmpty, () => drafter.DraftArea = null));
 
+				foreach (Area currentArea in currentMap.areaManager.AllAreas.OfType<Area_Allowed>())
+				{
+					Area tempArea = currentArea;
+					areaOptions.Add(new FloatMenuOption(tempArea.Label, () => drafter.DraftArea = tempArea));
+				}
+				Find.WindowStack.Add(new FloatMenu(areaOptions));
 			}
 			Widgets.Label(draftAllRect, GetDraftAllString());
 			Widgets.Checkbox(draftAllRect.position + (Vector2.right * draftAllRect.width), ref allSelected);
@@ -102,28 +124,28 @@ namespace MoreVanillaStructure
 			
 			Widgets.BeginScrollView(listRect, ref scrollPosition, viewRect);
 			allSelected = true;
-			foreach (Pawn currentPawn in colonists)
+			foreach (Pawn currentColonist in colonists)
             {
-				RenderTexture currentPortrait = PortraitsCache.Get(currentPawn, portraitSize, Rot4.South);
-				ThingWithComps weapon = currentPawn.equipment?.Primary;
+				RenderTexture currentPortrait = PortraitsCache.Get(currentColonist, portraitSize, Rot4.South);
+				ThingWithComps weapon = currentColonist.equipment?.Primary;
                 Widgets.DrawHighlightIfMouseover(rowRect);
-                if(currentPawn.Drafted) Widgets.DrawLightHighlight(rowRect);
+                if(currentColonist.Drafted) Widgets.DrawLightHighlight(rowRect);
 
-				bool wasSelected = drafter.IsSelected(currentPawn);
+				bool wasSelected = drafter.IsSelected(currentColonist);
 				bool isSelected = wasSelected;
 				bool tempSelected = isSelected;
 				checkRect.y = rowRect.y;
 				GUI.DrawTexture(pawnPortraitRect, currentPortrait);
-				TipSignal currentPawnTip = new TipSignal($"{currentPawn.LabelCap}\n{currentPawn.GetInspectString()}", currentPawn.thingIDNumber);
-                TooltipHandler.TipRegion(pawnPortraitRect, currentPawnTip);
-				Widgets.InfoCardButton(pawnDetailRect.x, pawnDetailRect.y, currentPawn);
+				TipSignal currentColonistTip = new TipSignal($"{currentColonist.LabelCap}\n{currentColonist.GetInspectString()}", currentColonist.thingIDNumber);
+                TooltipHandler.TipRegion(pawnPortraitRect, currentColonistTip);
+				Widgets.InfoCardButton(pawnDetailRect.x, pawnDetailRect.y, currentColonist);
 				if(weapon != null)
 				{
 					Widgets.ThingIcon(pawnWeaponRect, weapon);
 					TooltipHandler.TipRegion(pawnWeaponRect, new TipSignal(weapon.LabelCapNoCount, weapon.thingIDNumber));
 				}
-				Widgets.Label(pawnNameRect, currentPawn.LabelCap);
-                TooltipHandler.TipRegion(pawnNameRect, currentPawnTip);
+				Widgets.Label(pawnNameRect, currentColonist.LabelCap);
+                TooltipHandler.TipRegion(pawnNameRect, currentColonistTip);
                 Widgets.Checkbox(checkRect.position, ref tempSelected);
 				if(currentEvent.isMouse && checkRect.Contains(currentEvent.mousePosition) && isLeftClick)
 				{
@@ -137,7 +159,7 @@ namespace MoreVanillaStructure
 
 				if (isSelected != wasSelected)
 				{
-					drafter.SetSelected(currentPawn, isSelected);
+					drafter.SetSelected(currentColonist, isSelected);
 				}
 
 				if(Widgets.ButtonInvisible(pawnInfoRect))
@@ -145,9 +167,9 @@ namespace MoreVanillaStructure
 					switch (currentEvent.button)
 					{
 						case 0:
-							CameraJumper.TryJump(currentPawn);
+							CameraJumper.TryJump(currentColonist);
                             Find.Selector.ClearSelection();
-                            Find.Selector.Select(currentPawn, playSound: true);
+                            Find.Selector.Select(currentColonist, playSound: true);
                             break;
 					}
 					currentEvent.Use();
@@ -165,26 +187,45 @@ namespace MoreVanillaStructure
     public class CompProperties_EmergencyDrafter : CompProperties
     {
         public CompProperties_EmergencyDrafter()
-        {
+		{
             compClass = typeof(CompEmergencyDrafter);
         }
     }
 
+	public class Building_TownBell : Building
+	{
+		public override void DrawExtraSelectionOverlays()
+		{
+			base.DrawExtraSelectionOverlays();
+			InspectPaneUtility.OpenTab(typeof(ITab_DraftSetting));
+		}
+	}
 
-    internal class CompEmergencyDrafter : ThingComp
+
+    public class CompEmergencyDrafter : ThingComp
     {
+        public Texture2D GetCallToArms4Selected_MenuIcon() => ContentFinder<Texture2D>.Get("UI/Commands/CallToArms_Selected", true);
+        public string GetCallToArms4SelectedLableString() => "CallToArms_Selected_Lable".Translate();
+        public string GetCallToArms4SelectedDescriptionString() => "CallToArms_Selected_Description".Translate();
+        public string GetCallToArms4NotSelectedDescriptionString() => "CallToArms_Not_Selected_Description".Translate();
+        public string GetCallToArms4HasNotDraftableDescriptionString() => "CallToArms_HasNot_Draftable_Description".Translate();
+
+        public Texture2D GetCallToArms4All_MenuIcon() => ContentFinder<Texture2D>.Get("UI/Commands/CallToArms_All", true);
+        public string GetCallToArms4AllLableString() => "CallToArms_All_Lable".Translate();
+        public string GetCallToArms4AllDescriptionString() => "CallToArms_All_Description".Translate();
+
+		public Texture2D GetDraftAllowCarryingBaby_MenuIcon() => ContentFinder<Texture2D>.Get("UI/Commands/DraftWithBaby", true);
+		public string GetDraftAllowCarryingBabyLableString() => "CallToArms_AllowCarryingBaby_Lable".Translate();
+		public string GetDraftAllowCarryingBabyDescriptionString() => "CallToArms_AllowCarryingBaby_Description".Translate();
+
+        List<Pawn> selectedColonist = new List<Pawn>();
+
         public CompProperties_EmergencyDrafter Props => (CompProperties_EmergencyDrafter)props;
 
-        public Texture2D GetCallToArms4Selected_MenuIcon() => ContentFinder<Texture2D>.Get("UI/Commands/CallToArms_Selected", true);
-        public string GetCallToArms4SelectedLableString() => "MVS_CallToArms_Selected_Lable".Translate();
-        public string GetCallToArms4SelectedDescriptionString() => "MVS_CallToArms_Selected_Description".Translate();
-        public string GetCallToArms4NotSelectedDescriptionString() => "MVS_CallToArms_Not_Selected_Description".Translate();
-        public string GetCallToArms4HasNotDraftableDescriptionString() => "MVS_CallToArms_HasNot_Draftable_Description".Translate();
-        public Texture2D GetCallToArms4All_MenuIcon() => ContentFinder<Texture2D>.Get("UI/Commands/CallToArms_All", true);
-        public string GetCallToArms4AllLableString() => "MVS_CallToArms_All_Lable".Translate();
-        public string GetCallToArms4AllDescriptionString() => "MVS_CallToArms_All_Description".Translate();
+		public int draftRadius = 25;
+		public bool draftGlobal = false;
 
-        List<Pawn> selectedPawn = new List<Pawn>();
+		public bool draftCarryingBaby = false;
 
 		Area _draftArea;
         public Area DraftArea
@@ -193,28 +234,31 @@ namespace MoreVanillaStructure
             set => _draftArea = value;
         }
 
-        public bool HasSelectedPawn => selectedPawn.Count > 0;
-        public bool HasDraftableSelectedPawn => selectedPawn.Any((current) => current != null && current.IsDraftable());
+        public bool HasSelectedPawn => selectedColonist.Count > 0;
+        public bool HasDraftableSelectedPawn => selectedColonist.Any((current) => current != null && current.IsDraftable());
 
 		public bool HasValidDraftArea() => _draftArea != null && _draftArea.IsValidArea(parent.Map);
-        public bool IsSelected(Pawn pawn) => selectedPawn.Contains(pawn);
-		public void ToggleSelected(Pawn pawn) { if (IsSelected(pawn)) selectedPawn.Remove(pawn); else selectedPawn.Add(pawn); }
-		public void SetSelected(Pawn pawn, bool value) { if (value) { if(!IsSelected(pawn))selectedPawn.Add(pawn); } else selectedPawn.Remove(pawn); }
+        public bool IsSelected(Pawn target) => selectedColonist.Contains(target);
+		public void ToggleSelected(Pawn target) { if (IsSelected(target)) selectedColonist.Remove(target); else selectedColonist.Add(target); }
+		public void SetSelected(Pawn target, bool value) { if (value) { if(!IsSelected(target))selectedColonist.Add(target); } else selectedColonist.Remove(target); }
 		public void SetSelected(List<Pawn> newList, bool value) 
 		{
-			selectedPawn.Clear();
-			if (value) selectedPawn.AddRange(newList); 
+			selectedColonist.Clear();
+			if (value) selectedColonist.AddRange(newList); 
 		}
-
+		public bool GetAllowCarryingBaby() => draftCarryingBaby;
+		public void SetAllowCarryingBaby(bool value) => draftCarryingBaby = value;
+		public void ToggleAllowCarryingBaby() => SetAllowCarryingBaby(!draftCarryingBaby);
 
 		public override void PostExposeData()
 		{
 			base.PostExposeData();
-			Scribe_Collections.Look(ref selectedPawn, "SelectedPawn", LookMode.Reference);
+			Scribe_Collections.Look(ref selectedColonist, "SelectedPawn", LookMode.Reference);
 			Scribe_References.Look(ref _draftArea, "DraftArea");
+			Scribe_Values.Look(ref draftCarryingBaby, "AllowCarryingBaby");
 			if(Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
-				selectedPawn?.RemoveAll((currentPawn) => currentPawn.DestroyedOrNull());
+				selectedColonist?.RemoveAll((currentPawn) => currentPawn.DestroyedOrNull());
 				if (!HasValidDraftArea()) DraftArea = null;
 			}
 		}
@@ -224,7 +268,8 @@ namespace MoreVanillaStructure
             yield return new Command_Action
             {
                 Disabled = !HasDraftableSelectedPawn,
-                disabledReason = !HasSelectedPawn ? GetCallToArms4NotSelectedDescriptionString() : !HasDraftableSelectedPawn ? GetCallToArms4HasNotDraftableDescriptionString() : "",
+                disabledReason = !HasSelectedPawn ? GetCallToArms4NotSelectedDescriptionString()
+								: !HasDraftableSelectedPawn ? GetCallToArms4HasNotDraftableDescriptionString() : "",
                 defaultLabel = GetCallToArms4SelectedLableString(),
                 defaultDesc = GetCallToArms4SelectedDescriptionString(),
                 icon = GetCallToArms4Selected_MenuIcon(),
@@ -238,51 +283,100 @@ namespace MoreVanillaStructure
                 icon = GetCallToArms4All_MenuIcon(),
                 action = OnCallToArms4All
             };
+
+			yield return new Command_Toggle
+			{
+				isActive = GetAllowCarryingBaby,
+				defaultLabel = GetDraftAllowCarryingBabyLableString(),
+				defaultDesc = GetDraftAllowCarryingBabyDescriptionString(),
+				icon = GetDraftAllowCarryingBaby_MenuIcon(),
+				toggleAction = ToggleAllowCarryingBaby
+			};
         }
 
-        private IntVec3 GetDraftableSpot()
+		IEnumerable<IntVec3> GetDraftableSpots(IntVec3 from, int radius, Area targetArea = null)
+		{
+			Map currentMap = parent.Map;
+			return GenRadial.RadialCellsAround(from, radius, true)
+				.Where(current => current.InBounds(currentMap) && current.Standable(currentMap) && (targetArea == null || targetArea[current]))
+				.OrderBy(current => current.DistanceToSquared(from));
+		}
+
+        IntVec3? GetDraftableSpot()
         {
             var map = parent.Map;
             if (map == null) return parent.Position;
 
             IntVec3 spot = parent.Position;
-
-            if (DraftArea != null)
+			IntVec3 result;
+			if (DraftArea != null)
             {
-                IntVec3 c;
                 if (CellFinder.TryFindRandomCellNear(parent.Position, map, 24,
                         x => DraftArea[x] && x.Standable(map) && map.reachability.CanReachColony(x),
-                        out c))
+                        out result))
 				{
-                    return c;
+                    return result;
+				}
+				else
+				{
+					return null;
 				}
             }
 
-            CellFinder.TryFindRandomCellNear(parent.Position, map, 8, x => x.Standable(map), out spot);
-            return spot;
+			if (CellFinder.TryFindRandomCellNear(parent.Position, map, 8, x => x.Standable(map), out result)) return result;
+			return null;
         }
+
+		void DraftAndMove(Pawn target, IntVec3 location)
+		{
+			if(target == null || !target.IsDraftable()) return;
+			Map map = target.Map;
+			if (map != parent.Map) return;
+
+			target.drafter.Drafted = true;
+
+			Job moveJob = JobMaker.MakeJob(JobDefOf.Goto, location);
+			moveJob.playerForced = true;
+			target.jobs.TryTakeOrderedJob(moveJob);
+		}
 
         public void OnCallToArms4Selected()
-        {
-            foreach(Pawn currentPawn in selectedPawn)
-			{
-				if(currentPawn.IsDraftable())
-				{
-					currentPawn.drafter.Drafted = true;
-				}
-			}
-        }
+		{
+			List<Pawn> draftTargets = selectedColonist
+				.Where(current => draftCarryingBaby || !current.IsCarryingBaby())
+				.OrderBy(current => current.Position.DistanceToSquared(parent.Position))
+				.ToList();
+			CalltoArms(draftTargets);
+		}
 
-        public void OnCallToArms4All()
+
+		public void OnCallToArms4All()
         {
-			List<Pawn> colonists = Find.ColonistBar.GetColonistsInOrder();
-			foreach (Pawn currentPawn in colonists)
+			List<Pawn> colonists = Find.ColonistBar.GetColonistsInOrder()
+				.Where(current=> draftCarryingBaby || !current.IsCarryingBaby())
+				.ToList();
+			CalltoArms(colonists);
+		}
+
+		void CalltoArms(List<Pawn> targetList)
+		{
+			if(targetList == null) return;
+
+			List<IntVec3> draftLocations = GetDraftableSpots(parent.Position, draftRadius, DraftArea).ToList();
+
+			int maxIndex = Mathf.Min(targetList.Count(), draftLocations.Count());
+			Find.Selector.ClearSelection();
+			for (int i = 0; i < maxIndex; i++)
 			{
-				if (currentPawn.IsDraftable() && currentPawn.Map == parent.Map)
-				{
-					currentPawn.drafter.Drafted = true;
-				}
+				Pawn currentTarget = targetList[i];
+				DraftAndMove(currentTarget, draftLocations[i]);
+				Find.Selector.Select(currentTarget, playSound: true);
 			}
+		}
+
+		void BacktoWork(List<Pawn> targetList)
+		{
+			foreach(Pawn target in targetList) target.drafter.Drafted = false;
 		}
 	}
 }

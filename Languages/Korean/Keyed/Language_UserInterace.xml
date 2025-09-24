@@ -9,15 +9,17 @@
 	<MVS_Fan_Strong>강풍</MVS_Fan_Strong>
 	
 	
-	<MVS_CallToArms_Selected_Lable>긴급 소집 (선택)</MVS_CallToArms_Selected_Lable>
-	<MVS_CallToArms_Not_Selected_Description>소집을 위해 선택된 인원이 없습니다.</MVS_CallToArms_Not_Selected_Description>
-	<MVS_CallToArms_HasNot_Draftable_Description>소집 가능한 인원이 없습니다.</MVS_CallToArms_HasNot_Draftable_Description>
-	<MVS_CallToArms_Selected_Description>이 건물에 할당된 정착민들을 소집합니다.</MVS_CallToArms_Selected_Description>
-	<MVS_CallToArms_All_Lable>긴급 소집 (모두)</MVS_CallToArms_All_Lable>
-	<MVS_CallToArms_All_Description>모든 정착민들을 소집합니다.</MVS_CallToArms_All_Description>
+	<CallToArms_Selected_Lable>긴급 소집 (선택)</CallToArms_Selected_Lable>
+	<CallToArms_Not_Selected_Description>소집을 위해 선택된 인원이 없습니다.</CallToArms_Not_Selected_Description>
+	<CallToArms_HasNot_Draftable_Description>소집 가능한 인원이 없습니다.</CallToArms_HasNot_Draftable_Description>
+	<CallToArms_Selected_Description>이 건물에 할당된 정착민들을 소집합니다.</CallToArms_Selected_Description>
+	<CallToArms_All_Lable>긴급 소집 (모두)</CallToArms_All_Lable>
+	<CallToArms_All_Description>모든 정착민들을 소집합니다.</CallToArms_All_Description>
+  <CallToArms_AllowCarryingBaby_Lable>아기를 안은 정착민 허용</CallToArms_AllowCarryingBaby_Lable>
+  <CallToArms_AllowCarryingBaby_Description>아기를 안고 있는 상태의 정착민도 소집하도록 허용합니다. 허용하면 아기를 안전한 곳에 데려다 놓고 위치로 이동합니다.</CallToArms_AllowCarryingBaby_Description>
 	
-	<MVS_Tab_DraftSelecter>소집</MVS_Tab_DraftSelecter>
-	<MVS_Button_DraftAll>전체 소집</MVS_Button_DraftAll>
-	<MVS_Button_DraftArea>구역 설정 없음 (주변)</MVS_Button_DraftArea>
+	<CallToArms_Tab_DraftSelecter>소집</CallToArms_Tab_DraftSelecter>
+	<CallToArms_Button_DraftAll>전체 소집</CallToArms_Button_DraftAll>
+  <CallToArms_Button_DraftAreaEmpty>구역 설정 없음 (주변)</CallToArms_Button_DraftAreaEmpty>
 
 </LanguageData>

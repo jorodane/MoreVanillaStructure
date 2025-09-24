@@ -248,7 +248,8 @@
 
 
 	<ThingDef Abstract ="true" ParentName ="BuildingBase" Name="TownBellBase">
-		<surfaceType>Item</surfaceType>
+    <thingClass>CallToArms.Building_TownBell</thingClass>
+    <surfaceType>Item</surfaceType>
 		<noRightClickDraftAttack>true</noRightClickDraftAttack>
 		<hasInteractionCell>true</hasInteractionCell>
 		<interactionCellOffset>(0,0,1)</interactionCellOffset>
@@ -274,12 +275,12 @@
 		<uiOrder>2050</uiOrder>
 		<designationCategory>Misc</designationCategory>
 		<comps>
-			<li Class="MoreVanillaStructure.CompProperties_EmergencyDrafter">
-				<compClass>MoreVanillaStructure.CompEmergencyDrafter</compClass>
+			<li Class="CallToArms.CompProperties_EmergencyDrafter">
+				<compClass>CallToArms.CompEmergencyDrafter</compClass>
 			</li>
 		</comps>
 		<inspectorTabs>
-			<li>MoreVanillaStructure.ITab_DraftSetting</li>
+			<li>CallToArms.ITab_DraftSetting</li>
 		</inspectorTabs>
 	</ThingDef>
 
