@@ -251,8 +251,6 @@
     <thingClass>CallToArms.Building_TownBell</thingClass>
     <surfaceType>Item</surfaceType>
 		<noRightClickDraftAttack>true</noRightClickDraftAttack>
-		<hasInteractionCell>true</hasInteractionCell>
-		<interactionCellOffset>(0,0,1)</interactionCellOffset>
 		<graphicData>
 			<graphicClass>Graphic_Multi</graphicClass>
 			<shaderType>CutoutComplex</shaderType>
@@ -277,6 +275,10 @@
 		<inspectorTabs>
 			<li>CallToArms.ITab_DraftSetting</li>
 		</inspectorTabs>
+		<drawPlaceWorkersWhileSelected>true</drawPlaceWorkersWhileSelected>
+		<placeWorkers>
+			<li>CallToArms.PlacWorker_TownBellDraftArea</li>
+		</placeWorkers>
 	</ThingDef>
 
 	<ThingDef ParentName="TownBellBase" Name="MiniTownBell">

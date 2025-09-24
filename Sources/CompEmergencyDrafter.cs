@@ -185,6 +185,20 @@ namespace CallToArms
         }
     }
 
+	public class PlacWorker_TownBellDraftArea : PlaceWorker
+	{
+        public override void DrawGhost(ThingDef def, IntVec3 center, Rot4 rot, Color ghostCol, Thing thing = null)
+        {
+            base.DrawGhost(def, center, rot, ghostCol, thing);
+			Map currentMap = Find.CurrentMap;
+			if (currentMap == null) return;
+
+			CompProperties_EmergencyDrafter props = def.GetCompProperties<CompProperties_EmergencyDrafter>();
+
+            GenDraw.DrawRadiusRing(center, Mathf.Max(1, props?.draftRadius ?? 8));
+        }
+    }
+
     public class CompProperties_EmergencyDrafter : CompProperties
     {
 		public int draftRadius = 25;
