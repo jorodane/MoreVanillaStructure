@@ -9,8 +9,8 @@ namespace CallToArms
 {
     public static class Extension_Pawn
     {
-        public static bool IsDraftable(this Pawn target) => target.Spawned && target.Faction == Faction.OfPlayer && target.drafter != null && !target.DeadOrDowned && !target.InMentalState;
-		public static bool IsValidArea(this Area area, Map map) => area.Map == map && area.TrueCount > 0;
+        public static bool IsDraftable(this Pawn target) => target.Spawned && !target.DestroyedOrNull() && target.Faction == Faction.OfPlayer && target.drafter != null && !target.DeadOrDowned && !target.InMentalState;
+		public static bool IsValidArea(this Area area, Map map) => area.Map != null && area.Map == map && map.areaManager.AllAreas.Contains(area);
 		public static bool IsCarryingBaby(this Pawn target)
 		{
 			Pawn carriedPawn = target.carryTracker?.CarriedThing as Pawn;
@@ -102,7 +102,8 @@ namespace CallToArms
 
 			bool wasAllSelected = allSelected;
 			string draftAreaEmpty = GetDraftAreaEmptyString();
-			string draftButtonText = drafter.DraftArea?.Label ?? draftAreaEmpty;
+			drafter.CheckValidDraftArea();
+            string draftButtonText = drafter.DraftArea?.Label ?? draftAreaEmpty;
 			if (Widgets.ButtonText(draftAreaRect, draftButtonText))
 			{
 				List<FloatMenuOption> areaOptions = new List<FloatMenuOption>();
@@ -186,19 +187,20 @@ namespace CallToArms
 
     public class CompProperties_EmergencyDrafter : CompProperties
     {
+		public int draftRadius = 25;
         public CompProperties_EmergencyDrafter()
-		{
+        {
             compClass = typeof(CompEmergencyDrafter);
         }
     }
 
 	public class Building_TownBell : Building
 	{
-		public override void DrawExtraSelectionOverlays()
-		{
-			base.DrawExtraSelectionOverlays();
-			InspectPaneUtility.OpenTab(typeof(ITab_DraftSetting));
-		}
+		//public override void DrawExtraSelectionOverlays()
+		//{
+		//	base.DrawExtraSelectionOverlays();
+		//	InspectPaneUtility.OpenTab(typeof(ITab_DraftSetting));
+		//}
 	}
 
 
@@ -218,11 +220,13 @@ namespace CallToArms
 		public string GetDraftAllowCarryingBabyLableString() => "CallToArms_AllowCarryingBaby_Lable".Translate();
 		public string GetDraftAllowCarryingBabyDescriptionString() => "CallToArms_AllowCarryingBaby_Description".Translate();
 
+		public string GetDraftAreaNotEnoughString(int count) => "CallToArms_Message_DraftAreaNotEnough".Translate(count.Named("count"));
+		public string GetDraftCancelByCarryingBabyString(int count) => "CallToArms_Message_DraftCancelByCarryingBaby".Translate(count.Named("count"));
+
         List<Pawn> selectedColonist = new List<Pawn>();
 
         public CompProperties_EmergencyDrafter Props => (CompProperties_EmergencyDrafter)props;
 
-		public int draftRadius = 25;
 		public bool draftGlobal = false;
 
 		public bool draftCarryingBaby = false;
@@ -238,6 +242,7 @@ namespace CallToArms
         public bool HasDraftableSelectedPawn => selectedColonist.Any((current) => current != null && current.IsDraftable());
 
 		public bool HasValidDraftArea() => _draftArea != null && _draftArea.IsValidArea(parent.Map);
+		public void CheckValidDraftArea() { if (_draftArea != null && !_draftArea.IsValidArea(parent.Map)) _draftArea = null; }
         public bool IsSelected(Pawn target) => selectedColonist.Contains(target);
 		public void ToggleSelected(Pawn target) { if (IsSelected(target)) selectedColonist.Remove(target); else selectedColonist.Add(target); }
 		public void SetSelected(Pawn target, bool value) { if (value) { if(!IsSelected(target))selectedColonist.Add(target); } else selectedColonist.Remove(target); }
@@ -340,37 +345,61 @@ namespace CallToArms
 			target.jobs.TryTakeOrderedJob(moveJob);
 		}
 
+		public void CheckCarryingBabyAlert(List<Pawn> from)
+		{
+            IEnumerable<Pawn> carryingBabyTargets = from.Where(current => draftCarryingBaby || current.IsCarryingBaby());
+            int carryingBabyCount = carryingBabyTargets.Count();
+            if (carryingBabyCount > 0) Messages.Message(GetDraftCancelByCarryingBabyString(carryingBabyCount), carryingBabyTargets.ToList(), MessageTypeDefOf.NegativeEvent, false);
+        }
+
         public void OnCallToArms4Selected()
 		{
-			List<Pawn> draftTargets = selectedColonist
-				.Where(current => draftCarryingBaby || !current.IsCarryingBaby())
-				.OrderBy(current => current.Position.DistanceToSquared(parent.Position))
-				.ToList();
+			CheckValidDraftArea();
+            if (selectedColonist.Any(current => current.DestroyedOrNull())) selectedColonist = selectedColonist.Where(current => !current.DestroyedOrNull()).ToList();
+
+			CheckCarryingBabyAlert(selectedColonist);
+
+            List<Pawn> draftTargets = selectedColonist
+			.Where(current => draftCarryingBaby || !current.IsCarryingBaby())
+			.OrderBy(current => current.Position.DistanceToSquared(parent.Position))
+			.ToList();
 			CalltoArms(draftTargets);
 		}
 
 
 		public void OnCallToArms4All()
         {
-			List<Pawn> colonists = Find.ColonistBar.GetColonistsInOrder()
-				.Where(current=> draftCarryingBaby || !current.IsCarryingBaby())
+			List<Pawn> colonist = Find.ColonistBar.GetColonistsInOrder();
+            CheckCarryingBabyAlert(colonist);
+
+            List<Pawn> draftTargets = colonist
+                .Where(current => draftCarryingBaby || !current.IsCarryingBaby())
 				.ToList();
-			CalltoArms(colonists);
+			CalltoArms(draftTargets);
 		}
 
 		void CalltoArms(List<Pawn> targetList)
 		{
 			if(targetList == null) return;
 
-			List<IntVec3> draftLocations = GetDraftableSpots(parent.Position, draftRadius, DraftArea).ToList();
+			List<IntVec3> draftLocations = GetDraftableSpots(parent.Position, Props.draftRadius, DraftArea).ToList();
 
-			int maxIndex = Mathf.Min(targetList.Count(), draftLocations.Count());
+			int originCount = targetList.Count();
+			int maxCount = Mathf.Min(originCount, draftLocations.Count());
 			Find.Selector.ClearSelection();
-			for (int i = 0; i < maxIndex; i++)
+			for (int i = 0; i < maxCount; i++)
 			{
 				Pawn currentTarget = targetList[i];
 				DraftAndMove(currentTarget, draftLocations[i]);
 				Find.Selector.Select(currentTarget, playSound: true);
+			}
+
+			if(originCount > maxCount)
+			{
+				List<Pawn> missingPawns = new List<Pawn>();
+				for (int i = maxCount; i < originCount; i++){missingPawns.Add(targetList[i]);}
+
+				Messages.Message(GetDraftAreaNotEnoughString(originCount - maxCount), missingPawns, MessageTypeDefOf.NegativeEvent, false);
 			}
 		}
 

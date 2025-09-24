@@ -4,6 +4,40 @@ using UnityEngine;
 
 namespace MoreVanillaStructure
 {
+    public class MoreVanillaStructureSettings : ModSettings
+    {
+        public int draftRadius = 25;
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref draftRadius, "DraftRadius", 25);
+        }
+    }
+
+    public class MoreVanillaStructureMod : Mod
+    {
+        public string GetLevelDescriptionString(int level) => "MVS_Fan_Level_Desc".Translate();
+
+        public static MoreVanillaStructureSettings Settings;
+
+        public MoreVanillaStructureMod(ModContentPack content) : base(content)
+        {
+            Settings = GetSettings<MoreVanillaStructureSettings>();
+        }
+
+        //public override string SettingsCategory() => "More Vanilla Structure";
+
+        //public override void DoSettingsWindowContents(Rect inRect)
+        //{
+        //    Listing_Standard listing = new Listing_Standard();
+
+        //    listing.Begin(inRect);
+
+        //    listing.End();
+        //}
+    }
+
     [DefOf]
     public static class MoreVanillaStructureDefs
     {

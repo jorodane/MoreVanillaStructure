@@ -274,11 +274,6 @@
 		<defaultPlacingRot>South</defaultPlacingRot>
 		<uiOrder>2050</uiOrder>
 		<designationCategory>Misc</designationCategory>
-		<comps>
-			<li Class="CallToArms.CompProperties_EmergencyDrafter">
-				<compClass>CallToArms.CompEmergencyDrafter</compClass>
-			</li>
-		</comps>
 		<inspectorTabs>
 			<li>CallToArms.ITab_DraftSetting</li>
 		</inspectorTabs>
@@ -287,7 +282,7 @@
 	<ThingDef ParentName="TownBellBase" Name="MiniTownBell">
 		<defName>Mini_Town_Bell</defName>
 		<label>MiniBell</label>
-		<description>Mini Size Town Bell. Can Draft Colonists</description>
+		<description>Mini Size Town Bell. Can Draft Colonists to around 12 tile-radius</description>
 		<rotatable>true</rotatable>
 		<fillPercent>0.4</fillPercent>
 		<thingCategories>
@@ -314,6 +309,11 @@
 			<buildingSizeCategory>Small</buildingSizeCategory>
 			<paintable>true</paintable>
 		</building>
+		<comps>
+			<li Class="CallToArms.CompProperties_EmergencyDrafter">
+				<draftRadius>12</draftRadius>
+			</li>
+		</comps>
 	</ThingDef>
 
 	<ThingDef ParentName="TownBellBase" Name="MediumTownBell">
@@ -321,7 +321,7 @@
 		<label>MediumBell</label>
 		<rotatable>false</rotatable>
 		<fillPercent>0.7</fillPercent>
-		<description>Medium Size Town Bell. Can Draft Colonists</description>
+		<description>Medium Size Town Bell. Can Draft Colonists to around 25 tile-radius</description>
 		<costStuffCount>50</costStuffCount>
 		<passability>Standable</passability>
 		<size>(2,1)</size>
@@ -345,6 +345,11 @@
 			<buildingSizeCategory>Medium</buildingSizeCategory>
 			<paintable>true</paintable>
 		</building>
+		<comps>
+			<li Class="CallToArms.CompProperties_EmergencyDrafter">
+				<draftRadius>25</draftRadius>
+			</li>
+		</comps>
 	</ThingDef>
 
 

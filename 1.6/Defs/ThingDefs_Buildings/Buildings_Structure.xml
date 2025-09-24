@@ -227,7 +227,7 @@
 		<neverMultiSelect>false</neverMultiSelect>
 		<useStuffTerrainAffordance>true</useStuffTerrainAffordance>
 		<uiOrder>2000</uiOrder>
-		<holdsRoof>false</holdsRoof>
+		<holdsRoof>true</holdsRoof>
 		<blockLight>false</blockLight>
 		<staticSunShadowHeight>0.3</staticSunShadowHeight>
 

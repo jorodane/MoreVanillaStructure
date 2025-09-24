@@ -101,7 +101,7 @@ namespace MoreVanillaStructure
 				defaultDesc = GetLevelChangeButtonString(wantLevel),
 				icon = ContentFinder<Texture2D>.Get(GetIconPath(wantLevel), true),
 				groupKey = 4000,
-				action = () => SetLevel(wantLevel)
+				action = () => SetLevelWithMote(wantLevel)
 			};
 
 			if(level == wantLevel){result.defaultIconColor = selectedButtonColor;}
@@ -117,7 +117,14 @@ namespace MoreVanillaStructure
 			return level;
 		}
 
-		public void UpdatePowerOutput()
+		public int SetLevelWithMote(int newLevel)
+		{
+			int result = SetLevel(newLevel);
+            MoteMaker.ThrowText(parent.Position.ToVector3() + (Vector3.one * 0.5f), parent.Map, GetLevelDescriptionString(level), 3);
+			return result;
+        }
+
+        public void UpdatePowerOutput()
         {
             if (Power != null)
             {
