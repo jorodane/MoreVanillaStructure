@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using MoreVanillaStructure;
+using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -6,7 +7,7 @@ using Verse.AI;
 
 namespace MoreVanillaStructure
 {
-    internal class JobDriver_PlayDarts : JobDriver
+    public class JobDriver_PlayDarts : JobDriver
     {
         private const int ThrowSpeed = 24;
         private const int ThrowInterval = 180;

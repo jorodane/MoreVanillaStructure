@@ -2,16 +2,25 @@
 using Verse;
 using UnityEngine;
 
-namespace MoreVanillaStructure
+namespace CallToArms
+{
+    [DefOf]
+    public static class CallToArmsDefs
+    {
+        public static JobDef DraftAsJob;
+    }
+}
+
+    namespace MoreVanillaStructure
 {
     public class MoreVanillaStructureSettings : ModSettings
     {
-        public int draftRadius = 25;
+        //public int draftRadius = 25;
 
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look(ref draftRadius, "DraftRadius", 25);
+            //Scribe_Values.Look(ref draftRadius, "DraftRadius", 25);
         }
     }
 

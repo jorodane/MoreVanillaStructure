@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using MoreVanillaStructure;
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,16 +13,18 @@ namespace CallToArms
     {
         public static bool IsDraftable(this Pawn target, Map map) => target.Spawned && !target.DestroyedOrNull() && target.Faction == Faction.OfPlayer && target.drafter != null && !target.drafter.Drafted && !target.DeadOrDowned && !target.InMentalState && target.Map == map;
 		public static bool IsValidArea(this Area area, Map map) => area.Map != null && area.Map == map && map.areaManager.AllAreas.Contains(area);
-		public static bool IsCarryingBaby(this Pawn target)
+		public static Pawn IsCarryingBaby(this Pawn target)
 		{
+			if (!ModsConfig.BiotechActive) return null;
+
 			Pawn carriedPawn = target.carryTracker?.CarriedThing as Pawn;
 			if(carriedPawn != null && carriedPawn.RaceProps.Humanlike)
 			{
 				DevelopmentalStage stage = carriedPawn.ageTracker?.CurLifeStage?.developmentalStage ?? DevelopmentalStage.None;
 
-				return stage <= DevelopmentalStage.Baby;
+				return stage <= DevelopmentalStage.Baby ? carriedPawn : null;
 			}
-			return false;
+			return null;
 		}
     }
 
@@ -243,6 +246,26 @@ namespace CallToArms
 		//}
 	}
 
+    public class JobDriver_DraftAsJob : JobDriver
+    {
+        public override bool TryMakePreToilReservations(bool errorOnFailed) => true;
+
+        protected override IEnumerable<Toil> MakeNewToils()
+        {
+			Toil play = new Toil()
+			{
+				defaultCompleteMode = ToilCompleteMode.Delay
+			};
+
+            play.tickAction = () =>
+            {
+                if (pawn.IsDraftable(pawn.Map)) pawn.drafter.Drafted = true;
+				EndJobWith(JobCondition.Succeeded);
+            };
+            yield return play;
+        }
+    }
+
 
     public class CompEmergencyDrafter : ThingComp
     {
@@ -329,14 +352,17 @@ namespace CallToArms
                 action = OnCallToArms4All
             };
 
-			yield return new Command_Toggle
+			if(ModsConfig.BiotechActive)
 			{
-				isActive = GetAllowCarryingBaby,
-				defaultLabel = GetDraftAllowCarryingBabyLableString(),
-				defaultDesc = GetDraftAllowCarryingBabyDescriptionString(),
-				icon = GetDraftAllowCarryingBaby_MenuIcon(),
-				toggleAction = ToggleAllowCarryingBaby
-			};
+				yield return new Command_Toggle
+				{
+					isActive = GetAllowCarryingBaby,
+					defaultLabel = GetDraftAllowCarryingBabyLableString(),
+					defaultDesc = GetDraftAllowCarryingBabyDescriptionString(),
+					icon = GetDraftAllowCarryingBaby_MenuIcon(),
+					toggleAction = ToggleAllowCarryingBaby
+				};
+			}
         }
 
 		IEnumerable<IntVec3> GetDraftableSpots(IntVec3 from, int radius, Area targetArea = null)
@@ -378,16 +404,45 @@ namespace CallToArms
 			Map map = target.Map;
 			if (map != parent.Map) return;
 
-			target.drafter.Drafted = true;
 
-			Job moveJob = JobMaker.MakeJob(JobDefOf.Goto, location);
-			moveJob.playerForced = true;
-			target.jobs.TryTakeOrderedJob(moveJob);
+			target.jobs.ClearQueuedJobs();
+
+			Queue<Job> jobs = new Queue<Job>();
+
+			Pawn carryingBaby = target.IsCarryingBaby();
+            if (draftCarryingBaby && carryingBaby != null)
+			{
+				JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.BringBabyToSafety, carryingBaby));
+                JobEnqueue(jobs, JobMaker.MakeJob(CallToArmsDefs.DraftAsJob));
+			}
+			else
+			{
+                target.drafter.Drafted = true;
+            }
+
+            MakeJobQueue(target, location, jobs);
+
+            JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.Goto, location));
+			Job firstJob = jobs.Dequeue();
+			foreach (Job currentJob in jobs) target.jobs.jobQueue.EnqueueLast(currentJob);
+
+			target.jobs.StartJob(firstJob, JobCondition.InterruptForced, target.thinker.MainThinkNodeRoot, false, true, null, JobTag.DraftedOrder, true);
+        }
+
+		public virtual void JobEnqueue(Queue<Job> result, Job wantJob)
+		{
+            wantJob.playerForced = true;
+            result.Enqueue(wantJob);
+        }
+
+		public virtual void MakeJobQueue(Pawn target, IntVec3 location, Queue<Job> result)
+		{
+
 		}
 
 		public void CheckCarryingBabyAlert(List<Pawn> from)
 		{
-            IEnumerable<Pawn> carryingBabyTargets = from.Where(current => draftCarryingBaby || current.IsCarryingBaby());
+            IEnumerable<Pawn> carryingBabyTargets = from.Where(current => draftCarryingBaby || current.IsCarryingBaby() != null);
             int carryingBabyCount = carryingBabyTargets.Count();
             if (carryingBabyCount > 0) Messages.Message(GetDraftCancelByCarryingBabyString(carryingBabyCount), carryingBabyTargets.ToList(), MessageTypeDefOf.NegativeEvent, false);
         }
@@ -400,7 +455,7 @@ namespace CallToArms
 			CheckCarryingBabyAlert(selectedColonist);
 
             List<Pawn> draftTargets = selectedColonist
-			.Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable(parent.Map))
+			.Where(current => (draftCarryingBaby || current.IsCarryingBaby() == null) && current.IsDraftable(parent.Map))
 			.OrderBy(current => current.Position.DistanceToSquared(parent.Position))
 			.ToList();
 			CalltoArms(draftTargets);
@@ -413,8 +468,9 @@ namespace CallToArms
             CheckCarryingBabyAlert(colonist);
 
             List<Pawn> draftTargets = colonist
-                .Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable(parent.Map))
+                .Where(current => (draftCarryingBaby || current.IsCarryingBaby() == null) && current.IsDraftable(parent.Map))
                 .ToList();
+
 			CalltoArms(draftTargets);
 		}
 

@@ -6,7 +6,7 @@ using Verse.AI;
 
 namespace MoreVanillaStructure
 {
-    internal class JobDriver_WatchFace : JobDriver
+    public class JobDriver_WatchFace : JobDriver
     {
         TargetIndex MirrorIndex => TargetIndex.A;
 
