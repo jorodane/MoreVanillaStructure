@@ -10,7 +10,7 @@ namespace CallToArms
 {
     public static class Extension_Pawn
     {
-        public static bool IsDraftable(this Pawn target) => target.Spawned && !target.DestroyedOrNull() && target.Faction == Faction.OfPlayer && target.drafter != null && !target.drafter.Drafted && !target.DeadOrDowned && !target.InMentalState;
+        public static bool IsDraftable(this Pawn target, Map map) => target.Spawned && !target.DestroyedOrNull() && target.Faction == Faction.OfPlayer && target.drafter != null && !target.drafter.Drafted && !target.DeadOrDowned && !target.InMentalState && target.Map == map;
 		public static bool IsValidArea(this Area area, Map map) => area.Map != null && area.Map == map && map.areaManager.AllAreas.Contains(area);
 		public static bool IsCarryingBaby(this Pawn target)
 		{
@@ -27,6 +27,9 @@ namespace CallToArms
 
     public class ITab_DraftSetting : ITab
     {
+		static List<Pawn> savedList = null;
+		Area savedArea = null;
+
 		static readonly Vector2 tabSize = new Vector2(400f,600f);
 		static readonly Vector2 portraitSize = new Vector2(rowHeight, rowHeight);
 		bool? mouseSelected = null;
@@ -34,6 +37,7 @@ namespace CallToArms
         const string tabNameKey = "CallToArms_Tab_DraftSelecter";
 		const float headerHeight = 28f;
 		const float headerPadding = 16.0f;
+		const float copyButtonSize = 50.0f;
 		const float listPadding = 5.0f;
 		const float viewPadding = 16.0f;
 		const float rowPadding = 0.0f;
@@ -65,7 +69,28 @@ namespace CallToArms
             Rect headerRect = windowRect;
             headerRect.height = headerHeight;
 
-            Text.Font = GameFont.Medium;
+			Rect copyRect = headerRect;
+			copyRect.width = copyButtonSize;
+			copyRect.x = size.x - copyRect.width - 30.0f;
+			if (Widgets.ButtonText(copyRect, "Copy"))
+			{
+				savedList = drafter.GetSelected();
+				savedArea = drafter.DraftArea;
+			}
+
+			if (savedList != null)
+			{
+				Rect pasteRect = copyRect;
+				copyRect.width = copyButtonSize;
+				copyRect.x -= copyButtonSize;
+				if (Widgets.ButtonText(copyRect, "Paste"))
+				{
+					drafter?.SetSelected(savedList, true);
+					drafter.DraftArea = savedArea;
+				}
+			}
+
+			Text.Font = GameFont.Medium;
             Widgets.Label(headerRect, tabNameKey.Translate());
             Text.Font = GameFont.Small;
 
@@ -253,8 +278,8 @@ namespace CallToArms
             set => _draftArea = value;
         }
 
-        public bool HasSelectedPawn => selectedColonist.Count > 0;
-        public bool HasDraftableSelectedPawn => selectedColonist.Any((current) => current != null && current.IsDraftable());
+        public bool HasSelectedColonist => selectedColonist.Count > 0;
+        public bool HasDraftableSelectedColonist => selectedColonist.Any((current) => current != null && current.IsDraftable(parent.Map));
 
 		public bool HasValidDraftArea() => _draftArea != null && _draftArea.IsValidArea(parent.Map);
 		public void CheckValidDraftArea() { if (_draftArea != null && !_draftArea.IsValidArea(parent.Map)) _draftArea = null; }
@@ -264,8 +289,9 @@ namespace CallToArms
 		public void SetSelected(List<Pawn> newList, bool value) 
 		{
 			selectedColonist.Clear();
-			if (value) selectedColonist.AddRange(newList); 
+			if (value) selectedColonist.AddRange(newList.Where(current => current.Map == parent.Map)); 
 		}
+		public List<Pawn> GetSelected() => selectedColonist;
 		public bool GetAllowCarryingBaby() => draftCarryingBaby;
 		public void SetAllowCarryingBaby(bool value) => draftCarryingBaby = value;
 		public void ToggleAllowCarryingBaby() => SetAllowCarryingBaby(!draftCarryingBaby);
@@ -279,7 +305,6 @@ namespace CallToArms
 			if(Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
 				selectedColonist?.RemoveAll((currentPawn) => currentPawn.DestroyedOrNull());
-				if (!HasValidDraftArea()) DraftArea = null;
 			}
 		}
 
@@ -287,9 +312,9 @@ namespace CallToArms
         {
             yield return new Command_Action
             {
-                Disabled = !HasDraftableSelectedPawn,
-                disabledReason = !HasSelectedPawn ? GetCallToArms4NotSelectedDescriptionString()
-								: !HasDraftableSelectedPawn ? GetCallToArms4HasNotDraftableDescriptionString() : "",
+                Disabled = !HasDraftableSelectedColonist,
+                disabledReason = !HasSelectedColonist ? GetCallToArms4NotSelectedDescriptionString()
+								: !HasDraftableSelectedColonist ? GetCallToArms4HasNotDraftableDescriptionString() : "",
                 defaultLabel = GetCallToArms4SelectedLableString(),
                 defaultDesc = GetCallToArms4SelectedDescriptionString(),
                 icon = GetCallToArms4Selected_MenuIcon(),
@@ -375,7 +400,7 @@ namespace CallToArms
 			CheckCarryingBabyAlert(selectedColonist);
 
             List<Pawn> draftTargets = selectedColonist
-			.Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable())
+			.Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable(parent.Map))
 			.OrderBy(current => current.Position.DistanceToSquared(parent.Position))
 			.ToList();
 			CalltoArms(draftTargets);
@@ -388,7 +413,7 @@ namespace CallToArms
             CheckCarryingBabyAlert(colonist);
 
             List<Pawn> draftTargets = colonist
-                .Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable())
+                .Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable(parent.Map))
                 .ToList();
 			CalltoArms(draftTargets);
 		}

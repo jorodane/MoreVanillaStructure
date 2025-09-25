@@ -281,6 +281,58 @@
 		</placeWorkers>
 	</ThingDef>
 
+  <ThingDef ParentName="TownBellBase" Name="EmergencyAlarm">
+    <defName>EmergencyAlarm</defName>
+    <label>emergency alarm</label>
+    <description>Wall mounted Town Bell. Can Draft Colonists to around 12 tile-radius</description>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
+    <graphicData>
+      <texPath>Things/Building/Furniture/EmergencyAlarm</texPath>
+      <drawSize>(1,1)</drawSize>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawOffsetNorth>(0,0,0.43)</drawOffsetNorth>
+      <drawOffsetSouth>(0,0,-0.2)</drawOffsetSouth>
+      <drawOffsetWest>(-0.3,0,0)</drawOffsetWest>
+      <drawOffsetEast>(0.3,0,0)</drawOffsetEast>
+      <damageData>
+        <enabled>false</enabled>
+      </damageData>
+    </graphicData>
+    <uiIconPath>Things/Building/Furniture/EmergencyAlarm_MenuIcon</uiIconPath>
+    <statBases>
+      <MaxHitPoints>120</MaxHitPoints>
+      <Beauty>-2</Beauty>
+      <WorkToBuild>200</WorkToBuild>
+      <Mass>5</Mass>
+    </statBases>
+    <costStuffCount>15</costStuffCount>
+    <building>
+      <buildingSizeCategory>Small</buildingSizeCategory>
+      <paintable>true</paintable>
+      <isEdifice>false</isEdifice>
+      <isAttachment>true</isAttachment>
+    </building>
+    <comps>
+      <li Class="CallToArms.CompProperties_EmergencyDrafter">
+        <draftRadius>8</draftRadius>
+      </li>
+    </comps>
+    <size>(1,1)</size>
+    <rotatable>true</rotatable>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <altitudeLayer>BuildingOnTop</altitudeLayer>
+    <pathCost>0</pathCost>
+    <passability>Standable</passability>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <placeWorkers>
+      <li>Placeworker_AttachedToWall</li>
+    </placeWorkers>
+
+  </ThingDef>
+
 	<ThingDef ParentName="TownBellBase" Name="MiniTownBell">
 		<defName>Mini_Town_Bell</defName>
 		<label>MiniBell</label>
