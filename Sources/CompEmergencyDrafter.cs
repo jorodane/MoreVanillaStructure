@@ -4,12 +4,13 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.AI;
+using static UnityEngine.GraphicsBuffer;
 
 namespace CallToArms
 {
     public static class Extension_Pawn
     {
-        public static bool IsDraftable(this Pawn target) => target.Spawned && !target.DestroyedOrNull() && target.Faction == Faction.OfPlayer && target.drafter != null && !target.DeadOrDowned && !target.InMentalState;
+        public static bool IsDraftable(this Pawn target) => target.Spawned && !target.DestroyedOrNull() && target.Faction == Faction.OfPlayer && target.drafter != null && !target.drafter.Drafted && !target.DeadOrDowned && !target.InMentalState;
 		public static bool IsValidArea(this Area area, Map map) => area.Map != null && area.Map == map && map.areaManager.AllAreas.Contains(area);
 		public static bool IsCarryingBaby(this Pawn target)
 		{
@@ -348,7 +349,7 @@ namespace CallToArms
 
 		void DraftAndMove(Pawn target, IntVec3 location)
 		{
-			if(target == null || !target.IsDraftable()) return;
+			if(target == null) return;
 			Map map = target.Map;
 			if (map != parent.Map) return;
 
@@ -374,7 +375,7 @@ namespace CallToArms
 			CheckCarryingBabyAlert(selectedColonist);
 
             List<Pawn> draftTargets = selectedColonist
-			.Where(current => draftCarryingBaby || !current.IsCarryingBaby())
+			.Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable())
 			.OrderBy(current => current.Position.DistanceToSquared(parent.Position))
 			.ToList();
 			CalltoArms(draftTargets);
@@ -387,8 +388,8 @@ namespace CallToArms
             CheckCarryingBabyAlert(colonist);
 
             List<Pawn> draftTargets = colonist
-                .Where(current => draftCarryingBaby || !current.IsCarryingBaby())
-				.ToList();
+                .Where(current => (draftCarryingBaby || !current.IsCarryingBaby()) && current.IsDraftable())
+                .ToList();
 			CalltoArms(draftTargets);
 		}
 
