@@ -52,6 +52,8 @@ namespace CallToArms
 
 
 		public string GetDraftAllString() => "CallToArms_Button_DraftAll".Translate();
+		public string GetDraftCopyString() => "CallToArms_Button_DraftCopy".Translate();
+		public string GetDraftPasteString() => "CallToArms_Button_DraftPaste".Translate();
 		public string GetDraftAreaEmptyString() => "CallToArms_Button_DraftAreaEmpty".Translate();
 
 		public ITab_DraftSetting()
@@ -75,7 +77,7 @@ namespace CallToArms
 			Rect copyRect = headerRect;
 			copyRect.width = copyButtonSize;
 			copyRect.x = size.x - copyRect.width - 30.0f;
-			if (Widgets.ButtonText(copyRect, "Copy"))
+			if (Widgets.ButtonText(copyRect, GetDraftCopyString()))
 			{
 				savedList = drafter.GetSelected();
 				savedArea = drafter.DraftArea;
@@ -86,7 +88,7 @@ namespace CallToArms
 				Rect pasteRect = copyRect;
 				copyRect.width = copyButtonSize;
 				copyRect.x -= copyButtonSize;
-				if (Widgets.ButtonText(copyRect, "Paste"))
+				if (Widgets.ButtonText(copyRect, GetDraftPasteString()))
 				{
 					drafter?.SetSelected(savedList, true);
 					drafter.DraftArea = savedArea;
@@ -221,7 +223,6 @@ namespace CallToArms
             base.DrawGhost(def, center, rot, ghostCol, thing);
 			Map currentMap = Find.CurrentMap;
 			if (currentMap == null) return;
-
 			CompProperties_EmergencyDrafter props = def.GetCompProperties<CompProperties_EmergencyDrafter>();
 
             GenDraw.DrawRadiusRing(center, Mathf.Max(1, props?.draftRadius ?? 8));
@@ -251,18 +252,18 @@ namespace CallToArms
         public override bool TryMakePreToilReservations(bool errorOnFailed) => true;
 
         protected override IEnumerable<Toil> MakeNewToils()
-        {
-			Toil play = new Toil()
+		{
+			yield return Toils_General.DoAtomic(() =>
 			{
-				defaultCompleteMode = ToilCompleteMode.Delay
-			};
+				if (pawn.IsDraftable(pawn.Map))
+				{
+					Queue<Job> origins = new Queue<Job>();
+                    foreach (QueuedJob currentQueue in pawn.jobs.jobQueue.ToArray()) origins.Enqueue(currentQueue.job.Clone());
+                    pawn.drafter.Drafted = true;
 
-            play.tickAction = () =>
-            {
-                if (pawn.IsDraftable(pawn.Map)) pawn.drafter.Drafted = true;
-				EndJobWith(JobCondition.Succeeded);
-            };
-            yield return play;
+					foreach (Job currentQueue in origins) pawn.jobs.jobQueue.EnqueueLast(currentQueue);
+                }
+            });
         }
     }
 
@@ -373,31 +374,6 @@ namespace CallToArms
 				.OrderBy(current => current.DistanceToSquared(from));
 		}
 
-        IntVec3? GetDraftableSpot()
-        {
-            var map = parent.Map;
-            if (map == null) return parent.Position;
-
-            IntVec3 spot = parent.Position;
-			IntVec3 result;
-			if (DraftArea != null)
-            {
-                if (CellFinder.TryFindRandomCellNear(parent.Position, map, 24,
-                        x => DraftArea[x] && x.Standable(map) && map.reachability.CanReachColony(x),
-                        out result))
-				{
-                    return result;
-				}
-				else
-				{
-					return null;
-				}
-            }
-
-			if (CellFinder.TryFindRandomCellNear(parent.Position, map, 8, x => x.Standable(map), out result)) return result;
-			return null;
-        }
-
 		void DraftAndMove(Pawn target, IntVec3 location)
 		{
 			if(target == null) return;
@@ -410,19 +386,20 @@ namespace CallToArms
 			Queue<Job> jobs = new Queue<Job>();
 
 			Pawn carryingBaby = target.IsCarryingBaby();
-            if (draftCarryingBaby && carryingBaby != null)
-			{
-				JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.BringBabyToSafety, carryingBaby));
-                JobEnqueue(jobs, JobMaker.MakeJob(CallToArmsDefs.DraftAsJob));
-			}
-			else
-			{
-                target.drafter.Drafted = true;
-            }
+            if (draftCarryingBaby && carryingBaby != null) JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.BringBabyToSafety, carryingBaby));
+            JobEnqueue(jobs, JobMaker.MakeJob(CallToArmsDefs.DraftAsJob));
 
             MakeJobQueue(target, location, jobs);
 
-            JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.Goto, location));
+			Building interactionBuilding = map.listerBuildings.allBuildingsColonist.Find(current => (current.def?.hasInteractionCell ?? false) && current.InteractionCell == location && (current.GetComp<CompMannable>() != null));
+			if (interactionBuilding != null)
+			{
+				JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.ManTurret, interactionBuilding));
+			}
+			else
+			{
+				JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.Goto, location));
+			}
 			Job firstJob = jobs.Dequeue();
 			foreach (Job currentJob in jobs) target.jobs.jobQueue.EnqueueLast(currentJob);
 
@@ -442,7 +419,8 @@ namespace CallToArms
 
 		public void CheckCarryingBabyAlert(List<Pawn> from)
 		{
-            IEnumerable<Pawn> carryingBabyTargets = from.Where(current => draftCarryingBaby || current.IsCarryingBaby() != null);
+			if (draftCarryingBaby) return;
+            IEnumerable<Pawn> carryingBabyTargets = from.Where(current => current.IsCarryingBaby() != null);
             int carryingBabyCount = carryingBabyTargets.Count();
             if (carryingBabyCount > 0) Messages.Message(GetDraftCancelByCarryingBabyString(carryingBabyCount), carryingBabyTargets.ToList(), MessageTypeDefOf.NegativeEvent, false);
         }
@@ -497,11 +475,6 @@ namespace CallToArms
 
 				Messages.Message(GetDraftAreaNotEnoughString(originCount - maxCount), missingPawns, MessageTypeDefOf.NegativeEvent, false);
 			}
-		}
-
-		void BacktoWork(List<Pawn> targetList)
-		{
-			foreach(Pawn target in targetList) target.drafter.Drafted = false;
 		}
 	}
 }

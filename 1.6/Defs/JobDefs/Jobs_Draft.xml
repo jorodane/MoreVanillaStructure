@@ -4,6 +4,8 @@
 	<JobDef>
 		<defName>DraftAsJob</defName>
 		<driverClass>CallToArms.JobDriver_DraftAsJob</driverClass>
+		<reportString>Drafting</reportString>
+		<playerInterruptible>true</playerInterruptible>
 	</JobDef>
 
 </Defs>
