@@ -274,6 +274,7 @@
 		<designationCategory>Misc</designationCategory>
 		<inspectorTabs>
 			<li>CallToArms.ITab_DraftSetting</li>
+			<li>CallToArms.ITab_EquipmentSetting</li>
 		</inspectorTabs>
 		<drawPlaceWorkersWhileSelected>true</drawPlaceWorkersWhileSelected>
 		<placeWorkers>

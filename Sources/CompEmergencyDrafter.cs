@@ -26,16 +26,81 @@ namespace CallToArms
 			}
 			return null;
 		}
+	}
+
+	public class ITab_EquipmentSetting : ITab
+	{
+		static ThingFilter savedFilter = null;
+
+		const string tabNameKey = "CallToArms_Tab_EquipmentSelecter";
+
+        static readonly Vector2 tabSize = new Vector2(400f, 600f);
+
+        const float headerHeight = 28f;
+        const float headerPadding = 16.0f;
+        const float filterPadding = 10.0f;
+        const float copyButtonSize = 50.0f;
+
+		ThingFilterUI.UIState filterState = new ThingFilterUI.UIState();
+
+        Rect windowRect, headerRect, copyRect, pasteRect, filterRect;
+
+        public static string GetDraftCopyString() => "CallToArms_Button_DraftCopy".Translate();
+        public static string GetDraftPasteString() => "CallToArms_Button_DraftPaste".Translate();
+
+
+        public ITab_EquipmentSetting()
+		{
+			size = tabSize;
+			labelKey = tabNameKey;
+            windowRect = new Rect(0f, 0f, size.x, size.y).ContractedBy(10f);
+            headerRect = windowRect;
+            headerRect.height = headerHeight;
+            copyRect = headerRect;
+            copyRect.width = copyButtonSize;
+            copyRect.x = size.x - copyRect.width - 30.0f;
+            pasteRect = copyRect;
+            pasteRect.width = copyButtonSize;
+            pasteRect.x -= copyButtonSize;
+
+            float currentHeight = headerHeight + headerPadding;
+            filterRect = new Rect(filterPadding, currentHeight, windowRect.width - (filterPadding * 2), windowRect.height - currentHeight - filterPadding);
+        }
+
+		protected override void FillTab()
+		{
+            Event currentEvent = Event.current;
+
+            CompEmergencyDrafter drafter = SelThing?.TryGetComp<CompEmergencyDrafter>();
+            Map currentMap = SelThing?.Map;
+            if (drafter == null || currentMap == null) return;
+
+            if (Widgets.ButtonText(copyRect, GetDraftCopyString()))
+            {
+                savedFilter = drafter.EquipmentFilter;
+            }
+
+            if (savedFilter != null && Widgets.ButtonText(pasteRect, GetDraftPasteString()))
+            {
+                drafter.EquipmentFilter = savedFilter;
+            }
+
+            Text.Font = GameFont.Medium;
+            Widgets.Label(headerRect, tabNameKey.Translate());
+            Text.Font = GameFont.Small;
+
+            ThingFilterUI.DoThingFilterConfigWindow(filterRect, filterState, drafter.EquipmentFilter, CompEmergencyDrafter.OriginFilter);
+        }
     }
 
-    public class ITab_DraftSetting : ITab
+
+	public class ITab_DraftSetting : ITab
     {
 		static List<Pawn> savedList = null;
 		Area savedArea = null;
 
 		static readonly Vector2 tabSize = new Vector2(400f,600f);
 		static readonly Vector2 portraitSize = new Vector2(rowHeight, rowHeight);
-		bool? mouseSelected = null;
 
         const string tabNameKey = "CallToArms_Tab_DraftSelecter";
 		const float headerHeight = 28f;
@@ -47,19 +112,64 @@ namespace CallToArms
         const float rowHeight = 30f;
 		const float checkSize = 24f;
 
+        Rect windowRect, headerRect, copyRect, rowRect, pawnInfoRect, pasteRect, listRect, viewRect,
+			checkRect, draftAreaRect, draftAllRect, pawnPortraitRect, pawnDetailRect, pawnNameRect, pawnWeaponRect, pawnWeaponDetailRect;
+
         Vector2 scrollPosition;
 		bool allSelected = false;
+		bool? mouseSelected = null;
 
 
-		public string GetDraftAllString() => "CallToArms_Button_DraftAll".Translate();
-		public string GetDraftCopyString() => "CallToArms_Button_DraftCopy".Translate();
-		public string GetDraftPasteString() => "CallToArms_Button_DraftPaste".Translate();
-		public string GetDraftAreaEmptyString() => "CallToArms_Button_DraftAreaEmpty".Translate();
+        public static string GetDraftAllString() => "CallToArms_Button_DraftAll".Translate();
+		public static string GetDraftCopyString() => "CallToArms_Button_DraftCopy".Translate();
+		public static string GetDraftPasteString() => "CallToArms_Button_DraftPaste".Translate();
+		public static string GetDraftAreaEmptyString() => "CallToArms_Button_DraftAreaEmpty".Translate();
 
 		public ITab_DraftSetting()
         {
             size = tabSize;
             labelKey = tabNameKey;
+
+            windowRect = new Rect(0f, 0f, size.x, size.y).ContractedBy(10f);
+            headerRect = windowRect;
+            headerRect.height = headerHeight;
+			copyRect = headerRect;
+            copyRect.width = copyButtonSize;
+            copyRect.x = size.x - copyRect.width - 30.0f;
+            pasteRect = copyRect;
+            pasteRect.width = copyButtonSize;
+            pasteRect.x -= copyButtonSize;
+			float currentHeight = headerHeight + headerPadding;
+			listRect = new Rect(windowRect.x, currentHeight, windowRect.width, 0.0f);
+
+            viewRect = new Rect(0f, 0f, listRect.width - viewPadding, 0f);
+            rowRect = new Rect(rowPadding, 0f, viewRect.width, rowHeight);
+            pawnInfoRect = new Rect(rowRect.x, rowRect.y, viewRect.width - checkSize - rowPadding, rowHeight);
+            checkRect = new Rect(viewRect.width - checkSize, rowRect.y, checkSize, checkSize);
+
+            draftAreaRect = pawnInfoRect;
+            draftAreaRect.x = viewPadding;
+            draftAreaRect.width = windowRect.width - 150.0f;
+            draftAreaRect.y = currentHeight;
+
+            draftAllRect = draftAreaRect;
+            draftAllRect.x = draftAreaRect.x + draftAreaRect.width + viewPadding;
+            draftAllRect.width = windowRect.width - draftAllRect.x - viewPadding;
+
+            listRect.y = currentHeight += draftAllRect.height + viewPadding;
+            listRect.height = windowRect.height - currentHeight - listPadding;
+
+            pawnPortraitRect = pawnInfoRect;
+            pawnPortraitRect.width = rowHeight;
+            pawnDetailRect = pawnPortraitRect;
+            pawnDetailRect.x = pawnPortraitRect.width;
+            pawnNameRect = pawnInfoRect;
+            pawnNameRect.x = pawnDetailRect.x + pawnDetailRect.width;
+            pawnNameRect.width = pawnInfoRect.width - pawnNameRect.x - pawnPortraitRect.width;
+            pawnWeaponRect = pawnPortraitRect;
+            pawnWeaponRect.x = pawnNameRect.x + pawnNameRect.width;
+            pawnWeaponDetailRect = pawnWeaponRect;
+            pawnWeaponDetailRect.x = pawnWeaponRect.x - pawnWeaponRect.width;
         }
 
         protected override void FillTab()
@@ -70,70 +180,30 @@ namespace CallToArms
             Map currentMap = SelThing?.Map;
             if (drafter == null || currentMap == null) return;
 
-            Rect windowRect = new Rect(0f, 0f, size.x, size.y).ContractedBy(10f);
-            Rect headerRect = windowRect;
-            headerRect.height = headerHeight;
-
-			Rect copyRect = headerRect;
-			copyRect.width = copyButtonSize;
-			copyRect.x = size.x - copyRect.width - 30.0f;
 			if (Widgets.ButtonText(copyRect, GetDraftCopyString()))
 			{
 				savedList = drafter.GetSelected();
 				savedArea = drafter.DraftArea;
 			}
 
-			if (savedList != null)
+			if (savedList != null && Widgets.ButtonText(pasteRect, GetDraftPasteString()))
 			{
-				Rect pasteRect = copyRect;
-				copyRect.width = copyButtonSize;
-				copyRect.x -= copyButtonSize;
-				if (Widgets.ButtonText(copyRect, GetDraftPasteString()))
-				{
-					drafter?.SetSelected(savedList, true);
-					drafter.DraftArea = savedArea;
-				}
+				drafter.SetSelected(savedList, true);
+				drafter.DraftArea = savedArea;
 			}
 
 			Text.Font = GameFont.Medium;
             Widgets.Label(headerRect, tabNameKey.Translate());
             Text.Font = GameFont.Small;
 
-			float currentHeight = headerHeight + headerPadding;
 
 			List<Pawn> colonists = Find.ColonistBar.GetColonistsInOrder();
-			Rect listRect = new Rect(windowRect.x, currentHeight, windowRect.width, 0.0f);
-            Rect viewRect = new Rect(0f, 0f, listRect.width - viewPadding, colonists.Count * rowHeight);
+            viewRect.height = colonists.Count * rowHeight;
 
-            Rect rowRect = new Rect(rowPadding, 0f, viewRect.width, rowHeight);
-            Rect pawnInfoRect = new Rect(rowRect.x, rowRect.y, viewRect.width - checkSize - rowPadding, rowHeight);
-			Rect checkRect = new Rect(viewRect.width - checkSize, rowRect.y, checkSize, checkSize);
-
-            Rect draftAreaRect = pawnInfoRect;
-            draftAreaRect.x = viewPadding;
-            draftAreaRect.width = windowRect.width - 150.0f;
-            draftAreaRect.y = currentHeight;
-
-            Rect draftAllRect = draftAreaRect;
-			draftAllRect.x = draftAreaRect.x + draftAreaRect.width + viewPadding;
-			draftAllRect.width = windowRect.width - draftAllRect.x - viewPadding;
-
-			listRect.y = currentHeight += draftAllRect.height + viewPadding;
-			listRect.height = windowRect.height - currentHeight - listPadding;
-
-            Rect pawnPortraitRect = pawnInfoRect;
-			pawnPortraitRect.width = rowHeight;
-			Rect pawnDetailRect = pawnPortraitRect;
-			pawnDetailRect.x = pawnPortraitRect.width;
-			Rect pawnNameRect = pawnInfoRect;
-			pawnNameRect.x = pawnDetailRect.x + pawnDetailRect.width;
-			pawnNameRect.width = pawnInfoRect.width - pawnNameRect.x - pawnPortraitRect.width;
-			Rect pawnWeaponRect = pawnPortraitRect;
-			pawnWeaponRect.x = pawnNameRect.x + pawnNameRect.width;
-
-			bool wasAllSelected = allSelected;
-			string draftAreaEmpty = GetDraftAreaEmptyString();
 			drafter.CheckValidDraftArea();
+			bool wasAllSelected = allSelected;
+			float currentHeight = headerHeight + headerPadding;
+			string draftAreaEmpty = GetDraftAreaEmptyString();
             string draftButtonText = drafter.DraftArea?.Label ?? draftAreaEmpty;
 			if (Widgets.ButtonText(draftAreaRect, draftButtonText))
 			{
@@ -156,6 +226,7 @@ namespace CallToArms
 			
 			Widgets.BeginScrollView(listRect, ref scrollPosition, viewRect);
 			allSelected = true;
+			pawnPortraitRect.y = pawnDetailRect.y = pawnWeaponRect.y = pawnWeaponDetailRect.y = pawnNameRect.y = pawnInfoRect.y = rowRect.y = 0.0f;
 			foreach (Pawn currentColonist in colonists)
             {
 				RenderTexture currentPortrait = PortraitsCache.Get(currentColonist, portraitSize, Rot4.South);
@@ -175,8 +246,9 @@ namespace CallToArms
 				{
 					Widgets.ThingIcon(pawnWeaponRect, weapon);
 					TooltipHandler.TipRegion(pawnWeaponRect, new TipSignal(weapon.LabelCapNoCount, weapon.thingIDNumber));
-				}
-				Widgets.Label(pawnNameRect, currentColonist.LabelCap);
+                    Widgets.InfoCardButton(pawnWeaponDetailRect.x, pawnWeaponDetailRect.y, weapon);
+                }
+                Widgets.Label(pawnNameRect, currentColonist.LabelCap);
                 TooltipHandler.TipRegion(pawnNameRect, currentColonistTip);
                 Widgets.Checkbox(checkRect.position, ref tempSelected);
 				if(currentEvent.isMouse && checkRect.Contains(currentEvent.mousePosition) && isLeftClick)
@@ -207,7 +279,7 @@ namespace CallToArms
 					currentEvent.Use();
 				}
 
-				pawnPortraitRect.y = pawnDetailRect.y = pawnWeaponRect.y = pawnNameRect.y = pawnInfoRect.y = rowRect.y += rowHeight;
+				pawnPortraitRect.y = pawnDetailRect.y = pawnWeaponRect.y = pawnWeaponDetailRect.y = pawnNameRect.y = pawnInfoRect.y = rowRect.y += rowHeight;
 				allSelected &= isSelected;
             }
             Widgets.EndScrollView();
@@ -289,6 +361,19 @@ namespace CallToArms
 
         List<Pawn> selectedColonist = new List<Pawn>();
 
+        public static ThingFilter _originFilter;
+        public static ThingFilter OriginFilter => _originFilter;
+
+        ThingFilter _equipmentFilter;
+		public ThingFilter EquipmentFilter
+		{
+			get => _equipmentFilter;
+			set
+			{
+				if (_equipmentFilter == null) _equipmentFilter = new ThingFilter(); 
+				_equipmentFilter.CopyAllowancesFrom(value);
+			}
+		}
         public CompProperties_EmergencyDrafter Props => (CompProperties_EmergencyDrafter)props;
 
 		public bool draftGlobal = false;
@@ -320,15 +405,59 @@ namespace CallToArms
 		public void SetAllowCarryingBaby(bool value) => draftCarryingBaby = value;
 		public void ToggleAllowCarryingBaby() => SetAllowCarryingBaby(!draftCarryingBaby);
 
+		public override void Initialize(CompProperties props)
+		{
+			base.Initialize(props);
+			SetFilterAllow();
+		}
+		
+		public virtual void SetFilterAllow()
+		{
+			if (_originFilter == null)
+			{
+				_originFilter = new ThingFilter();
+				_originFilter.SetAllow(ThingCategoryDefOf.Weapons, true);
+				if (!ModsConfig.OdysseyActive) _originFilter.SetAllow(ThingCategoryDefOf.WeaponsUnique, true);
+
+				_originFilter.SetAllow(ThingCategoryDefOf.Apparel, true);
+				//_originFilter.SetAllow(ThingCategoryDefOf.ApparelArmor, true);
+				//_originFilter.SetAllow(ThingCategoryDefOf.ApparelUtility, true);
+				//_originFilter.SetAllow(ThingCategoryDefOf.ArmorHeadgear, true);
+
+				SpecialThingFilterDef smeltable = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowSmeltable");
+				SpecialThingFilterDef nonSmeltable = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowNonSmeltable");
+				SpecialThingFilterDef burnable = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowBurnable");
+				SpecialThingFilterDef nonBurnable = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowNonBurnable");
+				SpecialThingFilterDef biocodedWeapons = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowBiocodedWeapons");
+				SpecialThingFilterDef nonBiocodedWeapons = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowNonBiocodedWeapons");
+                SpecialThingFilterDef biocodedApparel = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowBiocodedApparel");
+                SpecialThingFilterDef nonBiocodedApparel = DefDatabase<SpecialThingFilterDef>.GetNamedSilentFail("AllowNonBiocodedApparel");
+
+				_originFilter.SetAllow(biocodedApparel, false);
+				_originFilter.SetAllow(biocodedWeapons, false);
+
+				_originFilter.hiddenSpecialFilters.Add(smeltable);
+				_originFilter.hiddenSpecialFilters.Add(nonSmeltable);
+				_originFilter.hiddenSpecialFilters.Add(burnable);
+				_originFilter.hiddenSpecialFilters.Add(nonBurnable);
+				_originFilter.hiddenSpecialFilters.Add(nonBiocodedWeapons);
+				_originFilter.hiddenSpecialFilters.Add(biocodedApparel);
+				_originFilter.hiddenSpecialFilters.Add(SpecialThingFilterDefOf.AllowNonDeadmansApparel);
+			}
+            if (EquipmentFilter == null) EquipmentFilter = _originFilter;
+		}
+
 		public override void PostExposeData()
 		{
 			base.PostExposeData();
 			Scribe_Collections.Look(ref selectedColonist, "SelectedPawn", LookMode.Reference);
 			Scribe_References.Look(ref _draftArea, "DraftArea");
+			Scribe_Deep.Look(ref _equipmentFilter, "EquipmentFilter");
 			Scribe_Values.Look(ref draftCarryingBaby, "AllowCarryingBaby");
 			if(Scribe.mode == LoadSaveMode.PostLoadInit)
 			{
 				selectedColonist?.RemoveAll((currentPawn) => currentPawn.DestroyedOrNull());
+				SetFilterAllow();
 			}
 		}
 
@@ -389,7 +518,7 @@ namespace CallToArms
             if (draftCarryingBaby && carryingBaby != null) JobEnqueue(jobs, JobMaker.MakeJob(JobDefOf.BringBabyToSafety, carryingBaby));
             JobEnqueue(jobs, JobMaker.MakeJob(CallToArmsDefs.DraftAsJob));
 
-            MakeJobQueue(target, location, jobs);
+            
 
 			Building interactionBuilding = map.listerBuildings.allBuildingsColonist.Find(current => (current.def?.hasInteractionCell ?? false) && current.InteractionCell == location && (current.GetComp<CompMannable>() != null));
 			if (interactionBuilding != null)
@@ -411,11 +540,6 @@ namespace CallToArms
             wantJob.playerForced = true;
             result.Enqueue(wantJob);
         }
-
-		public virtual void MakeJobQueue(Pawn target, IntVec3 location, Queue<Job> result)
-		{
-
-		}
 
 		public void CheckCarryingBabyAlert(List<Pawn> from)
 		{

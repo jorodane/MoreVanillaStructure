@@ -18,6 +18,7 @@
 	<CallToArms_AllowCarryingBaby_Lable>아기를 안은 정착민 허용</CallToArms_AllowCarryingBaby_Lable>
 	<CallToArms_AllowCarryingBaby_Description>아기를 안고 있는 상태의 정착민도 소집하도록 허용합니다. 허용하면 아기를 안전한 곳에 데려다 놓고 위치로 이동합니다.</CallToArms_AllowCarryingBaby_Description>
 
+	<CallToArms_Tab_EquipmentSelecter>장비</CallToArms_Tab_EquipmentSelecter>
 	<CallToArms_Tab_DraftSelecter>소집</CallToArms_Tab_DraftSelecter>
 	
 	<CallToArms_Button_DraftAll>전체 소집</CallToArms_Button_DraftAll>
